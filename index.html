@@ -1,0 +1,2848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Armfield Product Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Armfield brand palette */
+    --navy:          oklch(23% 0.09 265);   /* #1d2657 — logo background */
+    --orange:        oklch(63% 0.19 44);    /* #f07000 — logo underline  */
+
+    --bg:            oklch(99% 0.002 265);
+    --surface-1:     oklch(97% 0.004 265);
+    --surface-2:     oklch(94% 0.006 265);
+    --hairline:      oklch(89% 0.008 265);
+    --hairline-strong: oklch(80% 0.012 265);
+    --ink:           var(--navy);
+    --ink-mid:       oklch(38% 0.07 265);
+    --ink-dim:       oklch(55% 0.06 265);
+
+    /* Orange as the primary accent */
+    --accent:        var(--orange);
+    --accent-border: oklch(84% 0.08 44);
+    --accent-wash:   oklch(97% 0.03 44);
+
+    --sans: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    --display: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* Brand colours stay the same */
+      --navy:            oklch(23% 0.09 265);
+      --orange:          oklch(63% 0.19 44);
+
+      /* Dark surfaces */
+      --bg:              oklch(13% 0.02 265);
+      --surface-1:       oklch(17% 0.025 265);
+      --surface-2:       oklch(21% 0.03 265);
+      --hairline:        oklch(27% 0.035 265);
+      --hairline-strong: oklch(35% 0.04 265);
+
+      /* Light ink on dark background */
+      --ink:             oklch(95% 0.01 265);
+      --ink-mid:         oklch(72% 0.04 265);
+      --ink-dim:         oklch(55% 0.04 265);
+
+      /* Orange accent — slightly brighter for dark bg */
+      --accent:          oklch(70% 0.19 44);
+      --accent-border:   oklch(40% 0.12 44);
+      --accent-wash:     oklch(20% 0.06 44);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); height: 100%; }
+  body {
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--navy);
+    border-bottom: 3px solid var(--orange);
+  }
+  .topbar-inner {
+    max-width: 1120px; margin: 0 auto;
+    padding: 14px 48px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    background: none; border: none; cursor: pointer; padding: 0;
+    font-family: var(--display); font-size: 14px; color: #ffffff;
+    letter-spacing: -0.005em; font-weight: 500;
+  }
+  .logo-mark {
+    width: 22px; height: 22px; border-radius: 5px;
+    background: var(--orange); color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+  }
+  .topbar-right {
+    display: flex; gap: 6px; align-items: center;
+    font-family: var(--mono); font-size: 11px;
+    color: oklch(80% 0.04 265); letter-spacing: 0.08em;
+  }
+
+  .site-footer {
+    background: var(--navy);
+    border-top: 3px solid var(--orange);
+    color: rgba(255,255,255,0.65);
+    font-family: var(--sans);
+    font-size: 13px;
+    margin-top: auto;
+  }
+  .site-footer-inner {
+    max-width: 1120px; margin: 0 auto;
+    padding: 40px 48px 32px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+  }
+  .site-footer h4 {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.35); margin: 0 0 14px; text-transform: uppercase;
+  }
+  .site-footer a {
+    color: rgba(255,255,255,0.65); text-decoration: none; transition: color 140ms;
+  }
+  .site-footer a:hover { color: #ffffff; }
+  .site-footer-bottom {
+    max-width: 1120px; margin: 0 auto;
+    padding: 16px 48px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.3);
+  }
+  @media (prefers-color-scheme: dark) {
+    .topbar      { background: oklch(18% 0.04 265); }
+    .site-footer { background: oklch(18% 0.04 265); }
+  }
+
+  /* Manual overrides — applied via data-theme on <html> */
+  [data-theme="dark"] {
+    --bg:              oklch(13% 0.02 265);
+    --surface-1:       oklch(17% 0.025 265);
+    --surface-2:       oklch(21% 0.03 265);
+    --hairline:        oklch(27% 0.035 265);
+    --hairline-strong: oklch(35% 0.04 265);
+    --ink:             oklch(95% 0.01 265);
+    --ink-mid:         oklch(72% 0.04 265);
+    --ink-dim:         oklch(55% 0.04 265);
+    --accent:          oklch(70% 0.19 44);
+    --accent-border:   oklch(40% 0.12 44);
+    --accent-wash:     oklch(20% 0.06 44);
+  }
+  [data-theme="dark"] .topbar,
+  [data-theme="dark"] .site-footer { background: oklch(18% 0.04 265); }
+
+  [data-theme="light"] {
+    --bg:              oklch(99% 0.002 265);
+    --surface-1:       oklch(97% 0.004 265);
+    --surface-2:       oklch(94% 0.006 265);
+    --hairline:        oklch(89% 0.008 265);
+    --hairline-strong: oklch(80% 0.012 265);
+    --ink:             oklch(23% 0.09 265);
+    --ink-mid:         oklch(38% 0.07 265);
+    --ink-dim:         oklch(55% 0.06 265);
+    --accent:          oklch(63% 0.19 44);
+    --accent-border:   oklch(84% 0.08 44);
+    --accent-wash:     oklch(97% 0.03 44);
+  }
+  [data-theme="light"] .topbar,
+  [data-theme="light"] .site-footer { background: oklch(23% 0.09 265); }
+
+  @media (max-width: 640px) {
+    .site-footer-inner { grid-template-columns: 1fr; padding: 32px 20px 24px; gap: 28px; }
+    .site-footer-bottom { padding: 14px 20px; flex-direction: column; gap: 6px; text-align: center; }
+  }
+
+  /* ── Quote cart floating button ── */
+  .quote-fab {
+    position: fixed; bottom: 28px; right: 28px; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--orange); color: #fff;
+    border: none; border-radius: 999px;
+    padding: 12px 20px; cursor: pointer;
+    font-family: var(--sans); font-size: 14px; font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    transition: all 180ms;
+  }
+  .quote-fab:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.22); }
+
+  /* ── Quote table ── */
+  .quote-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .quote-table th {
+    background: var(--navy); color: #fff;
+    padding: 10px 12px; text-align: left;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; font-weight: 500;
+  }
+  .quote-table td { padding: 10px 12px; border-bottom: 1px solid var(--hairline); vertical-align: middle; }
+  .quote-table tr:last-child td { border-bottom: none; }
+  .quote-table tbody tr:hover td { background: var(--surface-1); }
+
+  /* ── Print / PDF styles ── */
+  @media print {
+    body > * { display: none !important; }
+    #quote-printable { display: block !important; position: static !important; }
+    #quote-printable * { visibility: visible !important; }
+    #quote-printable {
+      padding: 24px 32px;
+      font-family: Arial, sans-serif; font-size: 10pt; color: #000;
+    }
+    .no-print { display: none !important; }
+  }
+  #quote-printable { display: none; }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 900px) {
+    .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
+    .cat-grid { grid-template-columns: 1fr; }
+  }
+
+  .fade-in { animation: fade-in 260ms ease-out; }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .tweaks {
+    position: fixed; right: 18px; bottom: 18px; z-index: 50;
+    width: 268px; background: var(--bg);
+    border: 1px solid var(--hairline); border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    font-family: var(--sans); padding: 14px 16px 16px;
+  }
+  .tweaks h4 {
+    margin: 0 0 10px; font-size: 11px; letter-spacing: 0.14em;
+    font-family: var(--mono); color: var(--ink-dim); font-weight: 500;
+  }
+  .tweaks-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .tweaks-row > span { font-size: 11px; color: var(--ink-dim); }
+  .tweaks-seg { display: flex; gap: 2px; padding: 2px; background: var(--surface-2); border-radius: 6px; }
+  .tweaks-seg button {
+    flex: 1; padding: 6px 8px; border: none; background: transparent;
+    border-radius: 4px; font-size: 11px; color: var(--ink-dim); cursor: pointer;
+    font-family: inherit;
+  }
+  .tweaks-seg button.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+  /* ── Mobile ───────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .topbar-inner        { padding: 10px 16px; gap: 6px; }
+    .topbar-subtitle     { display: none; }
+    .topbar-models       { display: none; }
+    .topbar-sep          { display: none; }
+    .topbar-contact      { padding: 5px 10px !important; font-size: 10px !important; }
+    .page-pad            { padding: 32px 20px 64px !important; }
+    .hero-h1             { font-size: 34px !important; }
+    .detail-grid         { grid-template-columns: 1fr !important; gap: 28px !important; }
+    .contact-name-grid   { grid-template-columns: 1fr !important; }
+    .search-result-row   { grid-template-columns: 100px 1fr !important; }
+    .logo-nav            { gap: 4px !important; }
+  }
+
+  /* Contact form */
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field label { font-size: 12px; font-family: var(--mono); letter-spacing: 0.08em; color: var(--ink-dim); }
+  .form-field input, .form-field textarea {
+    padding: 10px 14px; border: 1px solid var(--hairline); border-radius: 7px;
+    background: var(--surface-1); font-family: var(--sans); font-size: 14px;
+    color: var(--ink); outline: none; transition: border-color 160ms; width: 100%;
+  }
+  .form-field input:focus, .form-field textarea:focus {
+    border-color: var(--accent-border); background: var(--bg);
+  }
+  .form-field textarea { resize: vertical; min-height: 120px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Data -->
+<script>
+// Armfield product data — all model numbers and names verified against armfield.co.uk
+window.ARMFIELD_DATA = {
+  // ── Quote calculation parameters (mirrors your Excel) ──
+  quoteParams: {
+    gbpToAed:     5,   // GBP → AED conversion rate (update as needed)
+    operationPct: 0.15,   // 15% operation/logistics cost
+    profitPct:    0.20,   // 20% profit margin
+    customsPct:   0.06,   // 6% customs & clearance
+    discountPct:  0.00,   // default discount
+    vatPct:       0.05,   // 5% UAE VAT
+    shippingCost: 0,      // AED — set per quote
+  },
+  // ── Firebase config — paste your firebaseConfig values here ──
+  firebase: {
+  apiKey:            'AIzaSyBDH8XyZoFDvovJXSJURDAlpe95yTwCNAU',
+  authDomain:        'armfield-produc-map.firebaseapp.com',
+  projectId:         'armfield-produc-map',
+  storageBucket:     'armfield-produc-map.firebasestorage.app',
+  messagingSenderId: '509929817915',
+  appId:             '1:509929817915:web:7e74fb9f338ad9112191e',
+  },
+  // ── EmailJS config — fill in after setting up your EmailJS account ──
+  emailjs: {
+    publicKey:  '9eHPhCj6rDj-TOjH-',
+    serviceId:  'service_14ngwxh',
+    templateId: 'template_7dkpvqa',
+    toEmail:    'pre-sales@medicom-grp.com',
+  },
+  majors: [
+    { id:"mech", name:"Mechanical Engineering", blurb:"Fluids, thermal systems, engines, HVAC", glyph:"mech",
+      categories:["fluid-mech","adv-fluid","fans-comp","heat-transfer-hx","heat-transfer-tx","thermo","refrig","renewable-energy","sv-friction","sv-materials","sv-machines","sv-vibrations"] },
+    { id:"chem", name:"Chemical Engineering", blurb:"Unit operations, reactors, biochemical processes", glyph:"chem",
+      categories:["unit-ops","reactors","process-control","heat-transfer-hx"] },
+    { id:"civil", name:"Civil Engineering", blurb:"Hydraulics, hydrology, open channel flow", glyph:"civil",
+      categories:["hydraulics","research-flume","adv-fluid","fluid-mech","h-instruments"] },
+    { id:"food", name:"Food Science & Technology", blurb:"Educational food tech and industrial processing", glyph:"food",
+      categories:["ift"] },
+    { id:"env", name:"Environmental Engineering", blurb:"Water, wastewater, filtration, irrigation", glyph:"env",
+      categories:["water-treat","irrigation"] },
+    { id:"mtx", name:"Mechatronics & Control", blurb:"Process control loops, Data acquisition", glyph:"mtx",
+      categories:["process-control","daq"] },
+  ],
+
+  categories: {
+    "fluid-mech":       { name:"Fluid Mechanics",                   series:"F series",       tag:"Fluids" },
+    "adv-fluid":        { name:"Advanced Fluid Mechanics",          series:"C series",       tag:"Fluids" },
+    "fans-comp":        { name:"Fans, Pumps & Compressors",         series:"FM series",      tag:"Fluids" },
+    "heat-transfer-tx": { name:"Heat Transfer",                     series:"HT10X family",  tag:"Thermal" },
+    "heat-transfer-hx": { name:"Heat Exchangers",                   series:"HT30X family",  tag:"Thermal" },
+    "thermo":           { name:"Thermodynamics",                    series:"TH series",      tag:"Thermal" },
+   // "ic-engines":       { name:"Internal Combustion Engines",       series:"CM series",      tag:"Thermal" },
+    "refrig":           { name:"Refrigeration & Air Conditioning",  series:"RA series",      tag:"Thermal" },
+    "unit-ops":         { name:"Unit Operations",                   series:"UOP series",     tag:"Process" },
+    "reactors":         { name:"Chemical Reactors",                 series:"CE series",      tag:"Process" },
+   // "biochem":          { name:"Biochemical Engineering",           series:"BE series",      tag:"Process" },
+    "process-control":  { name:"Process Control",                   series:"PCT series",     tag:"Control" },
+    "hydraulics":       { name:"Applied Hydraulics & Hydrology",    series:"S series",       tag:"Civil" },
+    "research-flume":   { name:"Research Flumes",                   series:"S60/S80/S100",   tag:"Civil" },
+    "h-instruments":    { name:"Hydraulic Instruments",             series:"H series",       tag:"Civil" },
+    "ft-edu":           { name:"Educational Food Technology",       series:"FT series",      tag:"Food" },
+    "ift":              { name:"Educational & Industrial Food Technology",        series:"FT / IFT",       tag:"Food" },
+    "water-treat":      { name:"Water Treatment",                   series:"W series",       tag:"Environmental" },
+    "irrigation":       { name:"Irrigation Water Management",       series:"FE series",      tag:"Environmental" },
+    "daq":              { name:"Control & Acquisition Systems",     series:"CA series",      tag:"Control" },
+    "renewable-energy": { name:"Renewable Energy",                   series:"RE series",      tag:"Renewable" },
+    "sv-friction":      { name:"Friction",                           series:"SV900 series",   tag:"Statics" },
+    "sv-materials":     { name:"Strength of Materials",              series:"SV800 series",   tag:"Statics" },
+    "sv-machines":      { name:"Theory of Machines",                 series:"SD-1 series",    tag:"Mechanics" },
+    "sv-vibrations":    { name:"Vibrations",                         series:"SD2 / SD3",      tag:"Dynamics" },
+  },
+
+  products: [
+    // F1 Series – Fluid Mechanics
+    { id:"F1-10",      name:"Hydraulics Bench",                        cat:"fluid-mech", use:"Teaching",
+      desc:"Self-contained mobile bench providing controlled water supply for F1 accessory experiments.",
+      experiments:["Base unit for the F1 accessory range","Volumetric and gravimetric flow measurement","Closed-loop recirculation with integral sump","Accepts F1-11 through F1-38 modules"],
+      related:["F1-15-MKII","F1-18","F1-22-MKII"] },
+    { id:"F1-11",      name:"Dead Weight Pressure Gauge Calibrator",   cat:"fluid-mech", use:"Teaching",
+      desc:"Primary-standard dead-weight tester for calibration of Bourdon-type pressure gauges.",
+      experiments:["Calibration of a Bourdon gauge","Pressure-force-area relationship","Gauge hysteresis and repeatability"],
+      related:["F1-11","F1-29"] },
+    { id:"F1-12-MKII", name:"Hydrostatic Pressure",                    cat:"fluid-mech", use:"Teaching",
+      desc:"Quadrant tank for measuring hydrostatic thrust on a partially and fully submerged surface.",
+      experiments:["Centre of pressure determination","Moments of hydrostatic force","Partially vs fully submerged cases"],
+      related:["F1-29","F1-31"] },
+    { id:"F1-13-MKII", name:"Flow Over Weir",                          cat:"fluid-mech", use:"Teaching",
+      desc:"Interchangeable rectangular and V-notch weirs for head–discharge characterisation.",
+      experiments:["Cd for a rectangular weir","Cd for a V-notch weir","Head-discharge relationship"],
+      related:["F1-10","F1-19"] },
+    { id:"F1-14", name:"Metacentric Height",                      cat:"fluid-mech", use:"Teaching",
+      desc:"Pontoon with adjustable weight for measuring metacentric height and stability of floating bodies.",
+      experiments:["Metacentric height from list angle","Centre of gravity effects","Stability margin of floating bodies"],
+      related:["F1-29"] },
+    { id:"F1-15-MKII", name:"Bernoulli's Theorem Demonstration",       cat:"fluid-mech", use:"Teaching",
+      desc:"Venturi-shaped test section with piezometer tappings to verify the Bernoulli equation.",
+      experiments:["Static vs total head comparison","Venturi discharge coefficient","Energy conservation along a streamline"],
+      related:["F1-10","F1-21-MKII"] },
+    { id:"F1-16-MKII", name:"Impact of a Jet",                         cat:"fluid-mech", use:"Teaching",
+      desc:"Measures force produced by a water jet striking flat, hemispherical and conical vanes.",
+      experiments:["Momentum equation verification","Force vs vane geometry","Flow rate vs impact force"],
+      related:["F1-10"] },
+    { id:"F1-17",      name:"Orifice and Free Jet Flow",               cat:"fluid-mech", use:"Teaching",
+      desc:"Investigates jet trajectory and discharge coefficients from sharp-edged orifices.",
+      experiments:["Cd under varying heads","Jet trajectory plotting","Coefficients Cv and Cc"],
+      related:["F1-10","F1-17a"] },
+    { id:"F1-17a",     name:"Orifice Discharge",                       cat:"fluid-mech", use:"Teaching",
+      desc:"Simplified orifice discharge apparatus for comparing small- and large-aperture orifices.",
+      experiments:["Discharge coefficient determination","Aperture size effects","Head-discharge relationship"],
+      related:["F1-17"] },
+    { id:"F1-18",      name:"Energy Losses in Pipes",                  cat:"fluid-mech", use:"Teaching",
+      desc:"Parallel pipe test section for measuring friction losses in laminar and turbulent flow.",
+      experiments:["Darcy friction factor","Reynolds number transition","Pipe roughness effects"],
+      related:["F1-10","C6-MKII-10"] },
+    { id:"F1-19",      name:"Flow Channel",                            cat:"fluid-mech", use:"Teaching",
+      desc:"Small open channel with interchangeable weirs and gates for introductory open-channel flow studies.",
+      experiments:["Flow under a sluice gate","Flow over a broad-crested weir","Specific energy diagrams"],
+      related:["F1-10","F1-13-MKII"] },
+    { id:"F1-20",      name:"Osborne Reynolds Demonstration",          cat:"fluid-mech", use:"Teaching",
+      desc:"Classical dye-injection apparatus for visualising laminar, transitional and turbulent flow.",
+      experiments:["Reynolds number determination","Transition point observation","Dye-trace flow visualisation"],
+      related:["F1-20"] },
+    { id:"F1-21-MKII", name:"Flow Meter Demonstration",                cat:"fluid-mech", use:"Teaching",
+      desc:"Series-connected Venturi, orifice and rotameter flow meters for comparative study.",
+      experiments:["Calibration of three flow meters","Head loss across each meter","Meter accuracy vs flow"],
+      related:["F1-10","C9-MKII"] },
+    { id:"F1-22-MKII", name:"Energy Losses in Bends and Fittings",    cat:"fluid-mech", use:"Teaching",
+      desc:"Circuit of bends, sudden expansions, contractions and valves for minor loss studies.",
+      experiments:["Loss coefficients K for bends","Sudden enlargement / contraction losses","Valve characteristic"],
+      related:["F1-10","F1-18"] },
+    { id:"F1-23",      name:"Free and Forced Vortex",                  cat:"fluid-mech", use:"Teaching",
+      desc:"Cylindrical vessel for producing and profiling free and forced vortex flows.",
+      experiments:["Free vortex surface profile","Forced vortex parabolic profile","Angular velocity measurement"],
+      related:["F1-10"] },
+    { id:"F1-24",      name:"Hydraulic Ram",                           cat:"fluid-mech", use:"Teaching",
+      desc:"Working model of a hydraulic ram pump for studying water-hammer-driven lift.",
+      experiments:["Ram efficiency vs delivery head","Waste-water vs lift ratio","Cycle frequency effects"],
+      related:["F1-10"] },
+    { id:"F1-25-MKII", name:"Demonstration Pelton Turbine",            cat:"fluid-mech", use:"Teaching",
+      desc:"Small-scale Pelton wheel for studying impulse turbine performance.",
+      experiments:["Torque–speed curves","Turbine efficiency vs flow","Nozzle characteristics"],
+      related:["FM62-Pelton-Turbines","F1-10"] },
+    { id:"F1-27",      name:"Centrifugal Pump Characteristics",        cat:"fluid-mech", use:"Teaching",
+      desc:"Single-stage centrifugal pump test set with head, flow and power instrumentation.",
+      experiments:["Head–flow characteristic","Efficiency curves","Affinity laws at different speeds"],
+      related:["F1-35","FM51"] },
+    { id:"F1-28",      name:"Cavitation Demonstration",                cat:"fluid-mech", use:"Teaching",
+      desc:"Transparent Venturi section allowing direct observation of cavitation onset.",
+      experiments:["Cavitation onset at throat","Pressure vs flow conditions","NPSH concepts"],
+      related:["F1-27"] },
+    { id:"F1-29",      name:"Fluid Statics and Manometry",             cat:"fluid-mech", use:"Teaching",
+      desc:"Introductory bench covering hydrostatic pressure, manometry and buoyancy.",
+      experiments:["U-tube and inclined manometry","Archimedes' principle","Hydrostatic head comparisons"],
+      related:["F1-12-MKII","F1-31"] },
+    { id:"F1-30",      name:"Fluid Properties Apparatus",              cat:"fluid-mech", use:"Teaching",
+      desc:"Multi-station rig for measuring density, viscosity, surface tension and capillarity.",
+      experiments:["Falling sphere viscometry","Surface tension by capillary rise","Relative density"],
+      related:["F1-29"] },
+    { id:"F1-31",      name:"Pascal's Apparatus",                      cat:"fluid-mech", use:"Teaching",
+      desc:"Classical Pascal apparatus demonstrating pressure transmission through a fluid.",
+      experiments:["Pascal's law verification","Pressure independence of container shape"],
+      related:["F1-29"] },
+    { id:"F1-32",      name:"Francis Turbine",                         cat:"fluid-mech", use:"Teaching",
+      desc:"Bench-top Francis reaction turbine for performance characterisation.",
+      experiments:["Power vs flow","Speed-torque relationship","Reaction turbine efficiency"],
+      related:["FM61","F1-25-MKII"] },
+    { id:"F1-33",      name:"Pitot Tube Demonstrator",                 cat:"fluid-mech", use:"Teaching",
+      desc:"Traversing Pitot-static tube in a duct for velocity profile measurement.",
+      experiments:["Velocity profile across a pipe","Mean vs maximum velocity","Stagnation pressure concepts"],
+      related:["H30"] },
+    { id:"F1-35",      name:"Series and Parallel Pumps",               cat:"fluid-mech", use:"Teaching",
+      desc:"Pair of matched centrifugal pumps switchable between series and parallel configurations.",
+      experiments:["Series vs single pump head","Parallel vs single pump flow","System curve intersection"],
+      related:["F1-27","FM51"] },
+    { id:"F1-38",      name:"Hele Shaw Apparatus",                     cat:"fluid-mech", use:"Teaching",
+      desc:"Parallel-plate Hele-Shaw cell for two-dimensional ideal flow visualisation.",
+      experiments:["Flow past immersed bodies","Source / sink superposition","Laplacian flow analogy"],
+      related:["C10"] },
+
+    // C Series – Advanced Fluid Mechanics
+    { id:"C3-MKII",     name:"Multi-Pump Test Rig",                    cat:"adv-fluid", use:"Teaching",
+      desc:"Three-pump configurable rig for series, parallel and combined pump studies.",
+      experiments:["Series / parallel switching","Matching pumps to a system curve","Combined characteristic curves"],
+      related:["FM51","F1-35"] },
+    { id:"C4-MKII",     name:"Multi-Purpose Teaching Flume",           cat:"adv-fluid", use:"Teaching",
+      desc:"Tilting glass-sided flume with interchangeable weirs, gates and models.",
+      experiments:["Hydraulic jump characterisation","Flow over weirs and spillways","Sluice gate discharge"],
+      related:["S16"] },
+    { id:"C6-MKII-10",  name:"Fluid Friction Measurements",            cat:"adv-fluid", use:"Teaching",
+      desc:"Pipe-network rig for measuring friction in pipes, bends, valves and flow meters.",
+      experiments:["Friction factor vs Re","Loss coefficients for fittings","Flow meter calibration"],
+      related:["F1-18","F1-22-MKII"] },
+    { id:"C9-MKII",     name:"Flowmeter Demonstrator",                 cat:"adv-fluid", use:"Teaching",
+      desc:"Updated flowmeter rig with enhanced instrumentation and data logging.",
+      experiments:["Calibration of multiple meter types","Accuracy and repeatability","Reynolds number effects"],
+      related:["C9"] },
+    { id:"C10",         name:"Laminar Flow Table",                     cat:"adv-fluid", use:"Teaching",
+      desc:"Dyed flow table for visualising two-dimensional laminar patterns and streamlines.",
+      experiments:["Streamline visualisation","Flow around immersed objects","Source / sink superposition"],
+      related:["F1-38"] },
+    { id:"C11-MKII",    name:"Pipe Networks",                          cat:"adv-fluid", use:"Research",
+      desc:"Configurable pipe network for teaching Hardy-Cross and network analysis methods.",
+      experiments:["Hardy-Cross iteration","Flow distribution in networks","Head loss balancing"],
+      related:["C6-MKII-10"] },
+    { id:"C15",         name:"Computer Controlled Subsonic Wind Tunnel",cat:"adv-fluid", use:"Research",
+      desc:"Fully instrumented subsonic wind tunnel with PC-based control and force balance.",
+      experiments:["Lift, drag and pitching moment","Computerised data logging","Angle of attack sweeps"],
+      related:["C2","C30"] },
+    { id:"C30",         name:"Subsonic Wind Tunnel",                   cat:"adv-fluid", use:"Research",
+      desc:"Large-section computer-controlled subsonic wind tunnel for advanced aerodynamic testing.",
+      experiments:["High Re aerofoil testing","Wake surveys","3-component force measurement"],
+      related:["C15","C2"] },
+
+    // FM Series – Fans, Pumps & Turbines
+    { id:"FM50", name:"Centrifugal Pump Demonstration Unit", cat:"fans-comp", use:"Teaching",
+      desc:"Bench-top centrifugal pump with variable speed and throttle for performance characterisation.",
+      experiments:["Pressure–volume flow characteristic","ump efficiency","Speed scaling laws"],
+      related:["FM51"] },
+    { id:"FM51", name:"Series and Parallel Pumps Demonstration", cat:"fans-comp", use:"Teaching",
+      desc:"Dual centrifugal pump unit switchable between series and parallel operation.",
+      experiments:["Series vs single pump head","Parallel vs single pump flow","System operating point"],
+      related:["F1-35","C3-MKII"] },
+    { id:"FM52", name:"Gear Pump Demonstration Unit", cat:"fans-comp", use:"Teaching",
+      desc:"External-gear positive-displacement pump rig for viscous-fluid performance studies.",
+      experiments:["Flow vs back pressure","Volumetric efficiency","Slip characterisation"],
+      related:["FM53"] },
+    { id:"FM53", name:"Plunger Pump Demonstration Unit", cat:"fans-comp", use:"Teaching",
+      desc:"Reciprocating plunger pump rig illustrating positive displacement principles.",
+      experiments:["Discharge pulsation","Volumetric efficiency","Effect of air vessel"],
+      related:["FM52"] },
+    
+
+    // HT Series – Heat Transfer (HT10X family)
+    { id:"HT10X", name:"Computer Controlled Heat Transfer Teaching Equipment", cat:"heat-transfer-tx", use:"Research",
+      desc:"Base service unit providing instrumentation and PC control for the HT10X accessory range.",
+      experiments:["Host for HT11X – HT20X accessories","Multi-channel thermocouple logging","PC-based control"],
+      related:["HT11X","HT12X","HT14X","HT15X"] },
+    { id:"HT11X", name:"Linear Heat Conduction", cat:"heat-transfer-tx", use:"Teaching",
+      desc:"Composite bar specimens for measuring 1-D conduction and thermal conductivity.",
+      experiments:["Fourier's law verification","Thermal conductivity k","Contact resistance"],
+      related:["HT10X","HT12X"] },
+    { id:"HT12X", name:"Radial Heat Conduction", cat:"heat-transfer-tx", use:"Teaching",
+      desc:"Brass disc with radial heat flow to study steady-state 2-D conduction.",
+      experiments:["Radial temperature profile","Log-law conduction","Conductivity of brass"],
+      related:["HT10X","HT11X"] },
+    { id:"HT13X", name:"Laws of Radiant Heat Transfer and Radiant Heat Exchange", cat:"heat-transfer-tx", use:"Research",
+      desc:"Radiometer apparatus for studying radiation laws and surface properties.",
+      experiments:["Stefan-Boltzmann constant","Inverse-square relationship","Kirchhoff's law"],
+      related:["HT10X","HT16X"] },
+    { id:"HT14X", name:"Combined Convection and Radiation", cat:"heat-transfer-tx", use:"Teaching",
+      desc:"Heated cylinder studying the relative contributions of convection and radiation.",
+      experiments:["Natural and forced convection coefficients","Radiation share of total flux","Surface finish effects"],
+      related:["HT10X","HT19X"] },
+    { id:"HT15X", name:"Extended Surface Heat Exchanger", cat:"heat-transfer-tx", use:"Teaching",
+      desc:"Heated pin-fin specimen for combined conduction-convection studies.",
+      experiments:["Fin temperature distribution","Fin efficiency","Heat transfer coefficient h"],
+      related:["HT10X"] },
+    { id:"HT16X", name:"Radiation Errors in Temperature Measurement", cat:"heat-transfer-tx", use:"Research",
+      desc:"Rig for evaluating radiation errors in thermocouple measurement of gas temperature.",
+      experiments:["Radiation error quantification","Shield geometry effects","Correction methodologies"],
+      related:["HT10X","HT13X"] },
+    { id:"HT17X", name:"Unsteady-State Heat Transfer", cat:"heat-transfer-tx", use:"Research",
+      desc:"Instrumented metal shapes for transient-conduction and Biot/Fourier number studies.",
+      experiments:["Transient cooling curves","Biot number significance","Lumped vs distributed analysis"],
+      related:["HT10X"] },
+    { id:"HT18X", name:"Thermo-Electric Heat Pump", cat:"heat-transfer-tx", use:"Research",
+      desc:"Peltier-effect heat pump for reversible heating and cooling performance studies.",
+      experiments:["COP as heat pump vs refrigerator","Current vs heat-flow","Peltier effect quantification"],
+      related:["HT10X"] },
+    { id:"HT19X", name:"Free and Forced Convection", cat:"heat-transfer-tx", use:"Teaching",
+      desc:"Vertical heated tube with interchangeable specimens for convection coefficient studies.",
+      experiments:["Free-convection coefficient","Forced-convection coefficient","Fin enhancement comparison"],
+      related:["HT10X","HT14X"] },
+    { id:"HT20X", name:"Conductivity of Liquids and Gases", cat:"heat-transfer-tx", use:"Research",
+      desc:"Thin-film cell for measuring thermal conductivity of fluids with minimal convection.",
+      experiments:["Thermal conductivity of water","Conductivity of air / gases","Temperature dependence"],
+      related:["HT10X"] },
+
+    // HT Series – Heat Exchangers (HT30X family)
+    { id:"HT30X", name:"Computer Controlled Heat Exchanger Service Module", cat:"heat-transfer-hx", use:"Research",
+      desc:"Service unit providing flows, temperatures and DAQ for interchangeable HT3x exchangers.",
+      experiments:["Host for HT31X – HT37X","Parallel vs counter flow","LMTD and effectiveness-NTU"],
+      related:["HT31X","HT32X","HT33X","HT34X"] },
+    { id:"HT31X", name:"Tubular Heat Exchanger", cat:"heat-transfer-hx", use:"Teaching",
+      desc:"Concentric-tube heat exchanger for basic parallel- and counter-flow studies.",
+      experiments:["Parallel vs counter flow","Overall U determination","LMTD method"],
+      related:["HT30X","HT32X","HT33X"] },
+    { id:"HT32X", name:"Plate Heat Exchanger", cat:"heat-transfer-hx", use:"Teaching",
+      desc:"Gasketed plate heat exchanger module with configurable plate count.",
+      experiments:["Plate count vs effectiveness","NTU analysis","Pressure drop characterisation"],
+      related:["HT30X","HT31X"] },
+    { id:"HT33X", name:"Shell and Tube Heat Exchanger", cat:"heat-transfer-hx", use:"Teaching",
+      desc:"Multi-pass shell-and-tube module for realistic industrial-style exchanger studies.",
+      experiments:["Shell-side vs tube-side analysis","Baffle effect on U","Multi-pass correction factors"],
+      related:["HT30X","HT31X"] },
+    { id:"HT34X", name:"Jacketed Vessel With Coil & Stirrer", cat:"heat-transfer-hx", use:"Teaching",
+      desc:"Stirred, jacketed vessel with helical coil for batch heating/cooling studies.",
+      experiments:["Jacket vs coil heat transfer","Effect of stirrer speed","Batch heating curves"],
+      related:["HT30X"] },
+    { id:"HT35X", name:"Cross Flow Heat Exchanger", cat:"heat-transfer-hx", use:"Teaching",
+      desc:"Air–water cross-flow exchanger for studying tube-bank heat transfer.",
+      experiments:["Cross-flow correction factors","Air-side vs water-side U","Tube-bundle arrangement effects"],
+      related:["HT30X"] },
+    { id:"HT36X", name:"Extended Tubular Heat Exchanger", cat:"heat-transfer-hx", use:"Teaching",
+      desc:"Extended-length tubular exchanger providing a wider range of temperature profiles.",
+      experiments:["Axial temperature profile","Length vs effectiveness","Combined mode analysis"],
+      related:["HT30X","HT31X"] },
+    { id:"HT37X", name:"Extended Reconfigurable Heat Exchanger", cat:"heat-transfer-hx", use:"Teaching",
+      desc:"Reconfigurable multi-mode exchanger for advanced studies.",
+      experiments:["Multi-configuration comparison","Flow arrangement effects","Advanced modelling benchmarks"],
+      related:["HT30X"] },
+
+    // TH Series – Thermodynamics
+    { id:"TH1", name:"Temperature Measurement and Calibration", cat:"thermo", use:"Teaching",
+      desc:"Multi-sensor rig for comparing thermocouples, RTDs and thermistors.",
+      experiments:["Calibration against a reference","Sensor time-response","Stem conduction errors"],
+      related:["TH2"] },
+    { id:"TH2", name:"Pressure Measurement and Calibration", cat:"thermo", use:"Teaching",
+      desc:"Calibration rig covering manometers, Bourdon gauges and electronic transducers.",
+      experiments:["Absolute vs gauge pressure","Calibration curves","Transducer linearity"],
+      related:["F1-11","TH1"] },
+    { id:"TH3", name:"Saturation Pressure", cat:"thermo", use:"Teaching",
+      desc:"Boiler with pressure and temperature sensors for a saturated-steam P–T curve.",
+      experiments:["P–T relationship for water","Clausius-Clapeyron verification","Steam table comparison"],
+      related:["TH5"] },
+    { id:"TH5", name:"Expansion Process of a Perfect Gas", cat:"thermo", use:"Teaching",
+      desc:"Two-vessel gas apparatus for studying isothermal and adiabatic expansion.",
+      experiments:["Adiabatic exponent γ","Isothermal vs adiabatic expansion","PV relationships"],
+      related:["TH3","TH4"] },
+    { id:"TH6", name:"Film and Dropwise Condensation Demonstration Unit", cat:"thermo", use:"Teaching",
+      desc:"Condensation rig for comparing film and dropwise regimes on treated surfaces.",
+      experiments:["Film vs dropwise h","Effect of surface treatment","Condensate flux measurement"],
+      related:["HT30X"] },
+
+    // RA Series – Refrigeration & Air Conditioning
+    { id:"RA1-MKII", name:"Computer Controlled Vapour-Compression Refrigeration Unit", cat:"refrig", use:"Research",
+      desc:"Full vapour-compression refrigeration cycle with computer-based instrumentation and control.",
+      experiments:["P–h diagram construction","COP determination","Superheat and subcooling","Load variation effects"],
+      related:["RA2","RA3"] },
+    { id:"RA2", name:"Computer Controlled Air Conditioning Unit", cat:"refrig", use:"Research",
+      desc:"Full psychrometric duct with heating, cooling, humidification and re-heat stations.",
+      experiments:["Psychrometric process plotting","Sensible and latent loads","Cooling coil bypass factor"],
+      related:["RA1-MKII","RA3"] },
+    { id:"RA3", name:"Recirculating Air Conditioning Unit", cat:"refrig", use:"Teaching",
+      desc:"Recirculating air-conditioning rig for variable mix-ratio studies.",
+      experiments:["Fresh-air vs recirculation mixing","Space load simulation","Comfort-zone envelope"],
+      related:["RA2"] },
+
+    // UOP Series – Unit Operations
+    { id:"UOP3",       name:"Distillation Columns",                       cat:"unit-ops", use:"Research",
+      desc:"Continuous and batch distillation column platform for binary separation studies.",
+      experiments:["McCabe-Thiele analysis","Reflux ratio effects","Column efficiency (HETP)","Binary separation trials"],
+      related:["UOP5-MKII","UOP7-MKII"] },
+    { id:"UOP4-MKII",  name:"Solid/Liquid Extraction Unit",               cat:"unit-ops", use:"Research",
+      desc:"Continuous counter-current solid-liquid extraction column.",
+      experiments:["Stage efficiency","Solvent-to-feed ratio","Mass transfer coefficients"],
+      related:["UOP3","UOP5-MKII"] },
+    { id:"UOP5-MKII",  name:"Liquid/Liquid Extraction Unit",              cat:"unit-ops", use:"Research",
+      desc:"Packed column for immiscible liquid-liquid mass transfer studies.",
+      experiments:["Extraction efficiency","Distribution coefficients","Flooding velocity"],
+      related:["UOP7-MKII","UOP4-MKII"] },
+    { id:"UOP6-MKII",  name:"Computer Controlled Water Cooling Tower",    cat:"unit-ops", use:"Research",
+      desc:"Counter-current packed cooling tower with PC-based data acquisition.",
+      experiments:["Cooling range and approach","Mass and energy balances","Effect of packing type"],
+      related:["UOP3"] },
+    { id:"UOP7-MKII",  name:"Gas Absorption Column",                      cat:"unit-ops", use:"Research",
+      desc:"Packed column for studying gas-liquid mass transfer and pressure drop.",
+      experiments:["Flooding and loading limits","Absorption of CO₂ into NaOH","KGa determination","Pressure drop vs flow"],
+      related:["UOP3","UOP5-MKII"] },
+    { id:"UOP8-MkIIe", name:"Computer Controlled Tray Dryer",             cat:"unit-ops", use:"Research",
+      desc:"Tray dryer with PC-controlled temperature, air velocity and humidity.",
+      experiments:["Drying curve characterisation","Constant and falling rate periods","Effect of air velocity"],
+      related:["UOP20X"] },
+    { id:"UOP10",      name:"Laboratory Steam Generator",                  cat:"unit-ops", use:"Research",
+      desc:"Compact steam generator providing laboratory-scale steam for unit operations experiments.",
+      experiments:["Steam generation capacity","Superheat vs wet steam","Auxiliary for UOP rigs"],
+      related:["UOP3","UOP20X"] },
+    { id:"UOP12",      name:"Filtration Unit",                            cat:"unit-ops", use:"Teaching",
+      desc:"Plate-and-frame filter press for studying cake filtration.",
+      experiments:["Cake filtration equation","Specific cake resistance","Compressibility effects"],
+      related:["W5-MKII"] },
+    { id:"UOP14-MKII", name:"Crystallisation Unit",                       cat:"unit-ops", use:"Research",
+      desc:"Stirred vessel with controlled cooling for batch crystallisation studies.",
+      experiments:["Cooling curves and nucleation","Crystal size distribution","Seeding effects"],
+      related:["UOP3"] },
+    { id:"UOP15",      name:"Fixed Bed Adsorption Unit",                  cat:"unit-ops", use:"Research",
+      desc:"Packed adsorption column for studying breakthrough curves and adsorbent capacity.",
+      experiments:["Breakthrough curve analysis","Adsorbent capacity","Mass transfer zone length"],
+      related:["UOP7-MKII"] },
+    { id:"UOP30",      name:"3-Phase Horizontal Separator",               cat:"unit-ops", use:"Research",
+      desc:"Oil-water-gas horizontal separator for studying phase separation dynamics.",
+      experiments:["Oil-water interface control","Gas carry-over","Retention time effects"],
+      related:[" "] },
+
+    // CE Series – Chemical Reactors
+    { id:"CEXC",      name:"Chemical Reactors Teaching Equipment – Service Unit", cat:"reactors", use:"Teaching",
+      desc:"Service unit providing pumps, heaters and PC-based DAQ for the CE reactor range.",
+      experiments:["Host for CEB, CEM, CET, CEY, CEZ","Multi-channel logging","Temperature and flow control"],
+      related:["CEB-MKIII","CEM-MKII","CET-MKII","CEY","CEZ"] },
+    { id:"CEB-MKIII", name:"Transparent Batch Reactor",                   cat:"reactors", use:"Teaching",
+      desc:"Transparent stirred-tank reactor for batch and semi-batch reaction studies.",
+      experiments:["Reaction rate constant k","Arrhenius activation energy","Semi-batch addition strategies"],
+      related:["CEXC","CEM-MKII"] },
+    { id:"CEK-MKII",  name:"Fluid Mixing Studies",                        cat:"reactors", use:"Teaching",
+      desc:"Transparent stirred vessel with interchangeable impellers for mixing-power studies.",
+      experiments:["Power number vs Reynolds","Blend time measurement","Impeller type comparison"],
+      related:["CEB-MKIII"] },
+    { id:"CEL-MKII",  name:"Fixed and Fluidised Bed Apparatus",          cat:"reactors", use:"Teaching",
+      desc:"Transparent column for studying packed and fluidised bed behaviour.",
+      experiments:["Minimum fluidisation velocity","Pressure drop vs flow","Bed expansion"],
+      related:["CEN-MKII"] },
+    { id:"CEM-MKII",  name:"Continuous Stirred Tank Reactor (CSTR)",     cat:"reactors", use:"Teaching",
+      desc:"Single CSTR for residence-time-distribution and continuous reaction studies.",
+      experiments:["RTD via pulse and step tests","Conversion vs residence time","CSTR vs PFR comparison"],
+      related:["CEXC","CEP-MKII","CET-MKII"] },
+    { id:"CEP-MKII",  name:"Stirred Tank Reactors in Series",            cat:"reactors", use:"Teaching",
+      desc:"Cascade of CSTRs in series for RTD and conversion studies.",
+      experiments:["Tanks-in-series model","Cumulative RTD E(t)","N-tank conversion improvement"],
+      related:["CEM-MKII","CEXC"] },
+    { id:"CEQ",       name:"Corrosion Studies Kit",                       cat:"reactors", use:"Teaching",
+      desc:"Electrochemical kit for studying corrosion mechanisms and protection methods.",
+      experiments:["Galvanic series","Cathodic protection","Corrosion rate measurement"],
+      related:[] },
+    { id:"CERa-MKII", name:"Gaseous Diffusion Coefficient Apparatus",    cat:"reactors", use:"Teaching",
+      desc:"Stefan-tube style apparatus for measuring gaseous diffusion coefficients.",
+      experiments:["Stefan-tube diffusion","Diffusivity temperature dependence","Binary gas systems"],
+      related:["CERb"] },
+    { id:"CERb",      name:"Liquid Diffusion Coefficient Apparatus",     cat:"reactors", use:"Teaching",
+      desc:"Cell for measuring diffusion coefficients in liquid-phase systems.",
+      experiments:["Liquid-phase diffusivity","Concentration profile analysis","Temperature effects"],
+      related:["CERa-MKII"] },
+    { id:"CET-MKII",  name:"Tubular Reactor",                            cat:"reactors", use:"Teaching",
+      desc:"Coiled tubular reactor for studying plug-flow kinetics.",
+      experiments:["PFR conversion vs residence time","Axial dispersion","Temperature profile effects"],
+      related:["CEXC","CEM-MKII","CEY","CEZ"] },
+    { id:"CEU",       name:"Catalytic Reactors",                         cat:"reactors", use:"Teaching",
+      desc:"Packed-bed catalytic reactor for studying heterogeneous catalysis.",
+      experiments:["Catalyst activity","Temperature and space-time effects","Deactivation observation"],
+      related:["CEXC","CET-MKII"] },
+    { id:"CEY",       name:"Laminar Flow Reactor",                       cat:"reactors", use:"Teaching",
+      desc:"Laminar-flow tubular reactor for studying non-ideal-flow kinetics.",
+      experiments:["Laminar RTD","Conversion deviation from PFR","Re dependence"],
+      related:["CEXC","CEZ","CET-MKII"] },
+    { id:"CEZ",       name:"Plug Flow Reactor",                          cat:"reactors", use:"Teaching",
+      desc:"Plug-flow tubular reactor optimised for near-ideal PFR behaviour.",
+      experiments:["Near-ideal PFR conversion","Axial concentration profile","Comparison with CSTR cascade"],
+      related:["CEXC","CEY","CEM-MKII"] },
+
+    // BE Series – Biochemical Engineering
+   // { id:"BE1", name:"Batch Enzyme Reactor",     cat:"biochem", use:"Research",
+   //   desc:"Temperature-controlled stirred vessel for batch enzyme-kinetics studies.",
+   //   experiments:["Michaelis-Menten kinetics","Km and Vmax determination","Enzyme inhibition studies"],
+   //   related:["BE2"] },
+   // { id:"BE2", name:"Chromatography Unit",      cat:"biochem", use:"Research",
+   //   desc:"Laboratory chromatography column for protein / biomolecule separation studies.",
+   //   experiments:["Elution profiles","Resolution vs flow rate","Column efficiency (plates)"],
+   //   related:["BE1"] },
+   // { id:"BE3", name:"Anaerobic Column Reactor", cat:"biochem", use:"Research",
+   //   desc:"Up-flow anaerobic column reactor for studying anaerobic digestion kinetics.",
+   //   experiments:["Biogas yield","Organic loading rate","HRT effects"],
+   //   related:["BE4","W8"] },
+   // { id:"BE4", name:"Anaerobic Tank Reactor",   cat:"biochem", use:"Research",
+   //   desc:"Stirred anaerobic tank reactor for broader anaerobic treatment studies.",
+   //   experiments:["Volumetric biogas production","Substrate removal efficiency","Temperature effects"],
+   //   related:["BE3","W8"] },
+
+    // CM Series – Internal Combustion Engines
+    // { id:"CM11", name:"Small Engine Test Set (Gasoline)", cat:"ic-engines", use:"Research",
+    //   desc:"Instrumented small gasoline engine test bed with eddy-current dynamometer.",
+    //   experiments:["Brake power vs speed","Specific fuel consumption","Thermal efficiency","Heat balance"],
+    //   related:["CM12"] },
+    // { id:"CM12", name:"Small Engine Test Set (Diesel)",   cat:"ic-engines", use:"Research",
+    //   desc:"Small diesel engine test bed with dynamometer and provision for emissions sampling.",
+    //   experiments:["Diesel performance mapping","Volumetric efficiency","Load / speed characterisation"],
+    //   related:["CM11"] },
+
+    // PCT Series – Process Control
+  
+  { id:"PCT60",     name:"Level Control",                            cat:"process-control", use:"Teaching",
+      desc:"Single-loop level control rig with tank, sensor and control valve.",
+      experiments:["PID tuning","Load disturbance response","Integral action effects"],
+      related:["PCT61","PCT62","PCT63"] },
+    { id:"PCT61",     name:"Flow Control",                             cat:"process-control", use:"Teaching",
+      desc:"Single-loop flow control rig with orifice meter and control valve.",
+      experiments:["Flow PID tuning","Valve characterisation","Disturbance rejection"],
+      related:["PCT60","PCT62","PCT63"] },
+    { id:"PCT62",     name:"Temperature Control",                      cat:"process-control", use:"Teaching",
+      desc:"Heated vessel for first-order temperature loop studies.",
+      experiments:["First-order response","PID tuning for thermal loops","Dead time effects"],
+      related:["PCT60","PCT61","PCT63"] },
+    { id:"PCT63",     name:"Pressure Control",                         cat:"process-control", use:"Teaching",
+      desc:"Pressurised-vessel pressure loop with control valve and transmitter.",
+      experiments:["Pressure PID tuning","Fast vs slow loop comparison","Regulator characterisation"],
+      related:["PCT60","PCT61","PCT62"] },
+    { id:"PCT64",     name:"Servo Pendulum",                           cat:"process-control", use:"Teaching",
+      desc:"Inverted-pendulum servo control rig for advanced control teaching.",
+      experiments:["Inverted pendulum stabilisation","State-feedback control","System identification"],
+      related:[""] },
+
+    // S Series – Applied Hydraulics & Hydrology
+    { id:"S1",          name:"Drainage and Seepage Tank",                 cat:"hydraulics", use:"Teaching",
+      desc:"Glass-fronted tank for demonstrating groundwater flow, flow nets and well drawdown.",
+      experiments:["Flow nets under dams","Well drawdown curves","Seepage beneath sheet piles"],
+      related:["S11"] },
+    { id:"S2",          name:"Mobile Bed and Flow Visualisation Tanks",   cat:"hydraulics", use:"Teaching",
+      desc:"Combined mobile-bed and flow visualisation tanks for sediment and flow observation.",
+      experiments:["Mobile bed scour","Flow around structures","Sediment transport visualisation"],
+      related:["S8-MKII"] },
+    { id:"S6-MKII",     name:"Standard Teaching and Research Flume",  cat:"hydraulics", use:"Research",
+      desc:"High‑precision tilting flume used for teaching and researching open‑channel hydraulics and real‑world water‑flow behaviour.",
+      experiments:["Flow Over Weirs","Gradually Varied Flow Profiles","Sediment Transport & Bedform Development"],
+      related:[""] },
+    { id:"S8-MKII",     name:"Sediment Transport Demonstration Channel",  cat:"hydraulics", use:"Research",
+      desc:"Recirculating tilting channel for studying sediment incipient motion and bed forms.",
+      experiments:["Shields parameter","Bedform evolution","Bed load transport rates"],
+      related:["C4-MKII"] },
+    { id:"S10",         name:"Rainfall Hydrographs",                      cat:"hydraulics", use:"Teaching",
+      desc:"Rainfall simulator and catchment tray for runoff hydrograph studies.",
+      experiments:["Rainfall-runoff hydrographs","Catchment area effects","Infiltration rates"],
+      related:["S12","FEL3"] },
+    { id:"S11",         name:"Ground Water Flow Unit",                    cat:"hydraulics", use:"Teaching",
+      desc:"Groundwater apparatus demonstrating aquifer flow and pumping behaviour.",
+      experiments:["Aquifer drawdown cones","Darcy's law","Observation well behaviour"],
+      related:["S1"] },
+    { id:"S12",         name:"Advanced Environmental Hydrology System",   cat:"hydraulics", use:"Research",
+      desc:"Advanced catchment rig combining rainfall, infiltration and stream-flow modelling.",
+      experiments:["Integrated catchment hydrology","Infiltration–runoff coupling","Unit hydrograph derivation"],
+      related:["S10","FEL3"] },
+    { id:"S16",         name:"Hydraulic Flow Demonstrator",               cat:"hydraulics", use:"Teaching",
+      desc:"Multi-feature open-channel demonstrator for weirs, gates and hydraulic jumps.",
+      experiments:["Hydraulic jump formation","Weir and sluice discharge","Specific energy diagrams"],
+      related:["C4-MKII","S17"] },
+    { id:"S17",         name:"River Flow Simulator",                      cat:"hydraulics", use:"Research",
+      desc:"Simulated river reach with sediment and structures for fluvial geomorphology studies.",
+      experiments:["Meander formation","Bank erosion processes","Flood routing"],
+      related:["S16"] },
+    { id:"FEL2",        name:"Soil/Water Model Tank",                     cat:"hydraulics", use:"Teaching",
+      desc:"Soil-water tank for demonstrating saturated-unsaturated flow.",
+      experiments:["Capillary rise","Soil moisture distribution","Darcy flow in soil"],
+      related:["FEL3"] },
+    { id:"FEL3",        name:"Rainfall Simulator",                        cat:"hydraulics", use:"Teaching",
+      desc:"Controlled rainfall simulator for runoff, infiltration and erosion experiments.",
+      experiments:["Rainfall intensity control","Infiltration measurement","Runoff coefficient"],
+      related:["S10","FEL2"] },
+    { id:"S60-S80-S100",name:"Standard Teaching and Research Flumes",     cat:"research-flume", use:"Research",
+      desc:"Standard-range teaching and research flumes (S60, S80, S100) for open-channel studies.",
+      experiments:["Open-channel hydraulics research","Sediment and hydraulic-jump studies","Fluvial modelling"],
+      related:["C4-MKII"] },
+
+    // H Series – Hydraulic Instruments
+     { id:"H1-1-H1-2-H1-3", name:"Vernier Hook & Point Gauges",          cat:"h-instruments", use:"Teaching",
+      desc:"Precision Vernier hook/point gauges for accurate water-surface measurement.",
+      experiments:["Water surface profiling","Weir-crest reference","High-accuracy level measurement"],
+      related:["H12"] },
+    { id:"H1-7-H1-8", name:"Digital Hook & Point Gauges",          cat:"h-instruments", use:"Teaching",
+      desc:"Precision digital hook/point gauges for accurate water-surface measurement.",
+      experiments:["Water surface profiling","Weir-crest reference","High-accuracy level measurement"],
+      related:["H12"] },
+      { id:"H1-11",        name:"Tripod Stand",           cat:"h-instruments", use:"Teaching",
+      desc:"A mounting tripod constructed from aluminium alloy is supported on three stainless steel rods secured by thumbscrews.",
+      experiments:["Differential pressure measurement","Inclined manometer sensitivity","Multi-point pressure readings"],
+      related:[""] },
+    { id:"H12",        name:"Liquid Manometers & Meters",           cat:"h-instruments", use:"Teaching",
+      desc:"Range of U-tube, inclined and multi-limb liquid manometers for pressure measurement.",
+      experiments:["Differential pressure measurement","Inclined manometer sensitivity","Multi-point pressure readings"],
+      related:[""] },
+       { id:"H12-8-H12-9",        name:"Portable Pressure Meters",           cat:"h-instruments", use:"Teaching",
+      desc:"A versatile, hand held, battery operated portable pressure meter capable of measuring pressures of water or air",
+      experiments:["Differential pressure measurement","Inclined manometer sensitivity","Multi-point pressure readings"],
+      related:[""] },
+    { id:"H30",        name:"Pitot Tubes",                          cat:"h-instruments", use:"Teaching",
+      desc:"Standard Pitot-static tubes for velocity measurement in ducts and channels.",
+      experiments:["Velocity profiling","Stagnation pressure measurement","Flow-meter calibration"],
+      related:["F1-33"] },
+    { id:"H33",        name:"Propeller Velocity Flowmeter",         cat:"h-instruments", use:"Teaching",
+      desc:"Propeller-type velocity flow meter for open-channel / flume measurements.",
+      experiments:["Point velocity measurement","Open-channel flow profiling"],
+      related:["H30"] },
+    { id:"H40-MKII",   name:"Wave Probe System",                    cat:"h-instruments", use:"Teaching",
+      desc:"Capacitive wave probe system for measuring surface-wave elevation.",
+      experiments:["Wave height and period","Wave spectrum measurement","Resonance studies"],
+      related:[] },
+    
+
+    // FE Series – Irrigation Water Management
+    { id:"FEL2",        name:"Soil/Water Model Tank",                     cat:"irrigation", use:"Teaching",
+      desc:"Soil-water tank for demonstrating saturated-unsaturated flow.",
+      experiments:["Capillary rise","Soil moisture distribution","Darcy flow in soil"],
+      related:["FEL3"] },
+    { id:"FEL3",        name:"Rainfall Simulator",                        cat:"irrigation", use:"Teaching",
+      desc:"Controlled rainfall simulator for runoff, infiltration and erosion experiments.",
+      experiments:["Rainfall intensity control","Infiltration measurement","Runoff coefficient"],
+      related:["S10","FEL2"] },
+    { id:"FEL6",        name:"Demonstration Lysimeter",               cat:"irrigation", use:"Research",
+      desc:"Laboratory lysimeter for measuring percolation and evapotranspiration.",
+      experiments:["Drainage quantification","Evapotranspiration balance","Irrigation efficiency"],
+      related:[""] },
+
+    // W Series – Water Treatment
+    { id:"W1-MKII",      name:"Flocculation Test Units",               cat:"water-treat", use:"Teaching",
+      desc:"Multi-stirrer jar-test rig for coagulation / flocculation optimisation.",
+      experiments:["Jar test coagulant dosing","Floc formation and settling","Optimum coagulant dose"],
+      related:["W2-MKII","W4-MKII"] },
+    { id:"W2-MKII", name:"Sedimentation Studies Apparatus",       cat:"water-treat", use:"Teaching",
+      desc:"Batch settling columns for particle settling velocity studies.",
+      experiments:["Stokes' law verification","Type I discrete settling","Hindered settling"],
+      related:["W7-MKII","W1-MKII"] },
+    { id:"W3-MKII", name:"Permeability - Fluidisation Studies Apparatus", cat:"water-treat", use:"Teaching",
+      desc:"Packed / fluidised bed column for permeability and fluidisation experiments.",
+      experiments:["Darcy permeability","Minimum fluidisation velocity","Bed expansion"],
+      related:["CEL-MKII"] },
+    { id:"W4-MKII", name:"Filterability Apparatus",               cat:"water-treat", use:"Research",
+      desc:"Laboratory filterability rig for characterising cake- and membrane-filter performance.",
+      experiments:["Specific resistance to filtration","Compressibility of cake","Throughput analysis"],
+      related:["W5-MKII","UOP12"] },
+    { id:"W5-MKII", name:"Deep Bed Filter Column",                cat:"water-treat", use:"Teaching",
+      desc:"Transparent sand filter column with piezometer tappings along the bed depth.",
+      experiments:["Headloss vs run time","Backwash effectiveness","Filter ripening"],
+      related:["W1-MKII","W4-MKII"] },
+    { id:"W7-MKII", name:"Model Sedimentation Tank",              cat:"water-treat", use:"Teaching",
+      desc:"Continuous-flow sedimentation tank for studying real-scale settling behaviour.",
+      experiments:["Surface overflow rate","Tracer residence time","Removal efficiency"],
+      related:["W2-MKII","W1-MKII"] },
+    { id:"W8",      name:"Anaerobic Digester",                    cat:"water-treat", use:"Research",
+      desc:"Laboratory anaerobic digester for studying biogas production and sludge stabilisation.",
+      experiments:["Biogas yield","Volatile solids reduction","HRT effects"],
+      related:["W11","BE3","BE4"] },
+    { id:"W9-MKII", name:"Ion Exchange Unit",                     cat:"water-treat", use:"Research",
+      desc:"Ion-exchange column for softening, demineralisation and exchange-kinetics studies.",
+      experiments:["Breakthrough curves","Exchange capacity","Regeneration efficiency"],
+      related:["UOP15"] },
+    { id:"W10-MKII",name:"Aeration Unit",                         cat:"water-treat", use:"Research",
+      desc:"Aeration tank for studying oxygen transfer and KLa determination.",
+      experiments:["Oxygen transfer coefficient KLa","Effect of aerator type","DO dynamics"],
+      related:["W11"] },
+    { id:"W11",     name:"Aerobic Digester",                      cat:"water-treat", use:"Research",
+      desc:"Aerobic digester for sludge stabilisation and volatile-solids reduction studies.",
+      experiments:["VS reduction vs SRT","Oxygen uptake rate","Digester temperature effects"],
+      related:["W8","W10-MKII"] },
+
+    // FT Series – Educational Food Technology
+   // { id:"FT-Series", name:"FT Series – Educational Food Technology", cat:"ft-edu", use:"Teaching",
+   //   desc:"Educational range introducing students to food-processing operations (pasteurisation, mixing, drying, separation).",
+   //   experiments:["Introductory food-processing demonstrations","Safe educational-scale operation","Curriculum-aligned experiments"],
+   //   related:["FT43","FT74XA","FT102LT"] },
+
+    // IFT Series – Industrial Food Technology
+    { id:"FT2",          name:"Hammer-Beater Mill",                    cat:"ift", use:"Research",
+      desc:"Laboratory hammer / beater mill for size reduction of friable food materials.",
+      experiments:["Particle size reduction","Size distribution analysis","Energy consumption"],
+      related:["FT5"] },
+    { id:"FT5",          name:"Ribbon and Cone Blender",               cat:"ift", use:"Research",
+      desc:"Dry-powder blender combining ribbon and cone mixing geometries.",
+      experiments:["Blend uniformity","Mixing time determination","Segregation studies"],
+      related:["FT2"] },
+    { id:"FT14",         name:"Plate and Frame Filter Press",          cat:"ift", use:"Research",
+      desc:"Laboratory plate-and-frame filter press for solids-liquid separation.",
+      experiments:["Cake filtration kinetics","Filter-cloth selection","Cake washing"],
+      related:["FT15","UOP12"] },
+    { id:"FT15",         name:"Disc Bowl Centrifuge",                  cat:"ift", use:"Research",
+      desc:"Laboratory disc-stack centrifuge for separating immiscible liquids or fine solids.",
+      experiments:["Cream-skim separation","Feed rate effects","Sigma-value scaling"],
+      related:["FT14","FT74XA"] },
+    { id:"FT17",         name:"Cross Flow Membrane Filtration",        cat:"ift", use:"Research",
+      desc:"Cross-flow membrane rig supporting MF / UF / NF / RO modules.",
+      experiments:["Flux vs TMP","Concentration polarisation","Solute rejection"],
+      related:["FT18"] },
+    { id:"FT18",         name:"Modular Cross Flow Filtration",         cat:"ift", use:"Research",
+      desc:"Pilot-scale modular cross-flow filtration system accepting multiple membrane module types.",
+      experiments:["Module comparison studies","Flux decline profiles","Cleaning cycle optimisation"],
+      related:["FT17"] },
+    { id:"FT20",         name:"Cheese Vat",                            cat:"ift", use:"Research",
+      desc:"Jacketed cheese vat with cutting / stirring for laboratory cheese trials.",
+      experiments:["Curd formation and cutting","Heat treatment profile","Whey separation"],
+      related:["FT21"] },
+    { id:"FT21",         name:"Butter Churn and Butter Making Accessories", cat:"ift", use:"Research",
+      desc:"Small-batch butter churn for laboratory butter-making.",
+      experiments:["Churning time vs temperature","Butter yield","Moisture in butter"],
+      related:["FT20"] },
+    { id:"FT22",         name:"Rising Film Evaporator",                cat:"ift", use:"Research",
+      desc:"Small rising-film evaporator processing samples from around 2 litres.",
+      experiments:["Overall heat transfer U","Boiling point elevation","Evaporation capacity"],
+      related:["UOP20X"] },
+    { id:"FT25",        name:"Modular Scraped Surface Heat Exchanger Systems", cat:"ift", use:"Research",
+      desc:"Modular scraped-surface heat exchanger for viscous / fouling-prone food products.",
+      experiments:["Heating of viscous fluids","Fouling rate measurement","Residence time distribution"],
+      related:["FT74XA"] },
+    { id:"FT28",         name:"Oil Extraction Screw Press",            cat:"ift", use:"Research",
+      desc:"Continuous screw press for mechanical expression of oilseeds.",
+      experiments:["Oil yield vs pressure","Residual oil in meal","Seed pretreatment effects"],
+      related:["FT29"] },
+    { id:"FT29",         name:"Batch Solvent Extraction and Desolventising Unit", cat:"ift", use:"Research",
+      desc:"Batch solvent extractor and desolventiser for oilseed and natural-product extraction.",
+      experiments:["Solvent extraction efficiency","Desolventising kinetics","Solvent recovery"],
+      related:["FT28"] },
+    { id:"FT30-MKIII",   name:"Spray Dryer",                           cat:"ift", use:"Research",
+      desc:"Co-current laboratory spray dryer for producing powders from aqueous feeds.",
+      experiments:["Drying kinetics","Outlet-temperature effects on moisture","Yield vs feed rate"],
+      related:["FT31","FT32","FT80"] },
+    { id:"FT31",         name:"Laboratory Fluid Bed Dryer",            cat:"ift", use:"Research",
+      desc:"Small fluid-bed dryer for studying fluidised drying of particulates.",
+      experiments:["Drying curves","Minimum fluidisation velocity","Bed temperature profile"],
+      related:["FT30-MKIII"] },
+    { id:"FT32",         name:"Drum Dryer",                            cat:"ift", use:"Research",
+      desc:"Laboratory drum dryer for thin-film drying of pastes and slurries.",
+      experiments:["Drum drying throughput","Film thickness effects","Product moisture characterisation"],
+      related:["FT30-MKIII"] },
+    { id:"FT34-MKII",     name:"Contact Plate Freezer",                 cat:"ift", use:"Research",
+      desc:"Contact plate freezer for rapid laboratory freezing trials.",
+      experiments:["Freezing curve characterisation","Heat flux measurement","Thickness effects"],
+      related:["",""] },
+    { id:"FT43",         name:"Laboratory Pasteuriser",                cat:"ift", use:"Research",
+      desc:"Compact laboratory HTST pasteuriser with plate exchangers and holding tube.",
+      experiments:["HTST pasteurisation regimes","Regeneration efficiency","Lethality F₀"],
+      related:["","FT74XA"] },
+    { id:"FT63",         name:"Laboratory Process Chiller",                cat:"ift", use:"Research",
+      desc:"Recirculating process chiller, providing a continuous supply of chilled liquid to serve as the cooling fluid when used with an Armfield miniature-scale processing unit.",
+      experiments:[""],
+      related:["FT18","FT74XA"] },
+    { id:"FT66",         name:"Neutraliser/Washer/Bleacher",                cat:"ift", use:"Research",
+      desc:"Floor-standing batch processing system.",
+      experiments:[""],
+      related:["FT18","FT74XA"] },
+    { id:"FT67",         name:"Hydrogenation Unit",                cat:"ift", use:"Research",
+      desc:"Floor-standing batch processing Vessel for edible oils.",
+      experiments:["Heating, Hydrogenation/Agitation, Cooling"],
+      related:["FT18","FT74XA"] },
+    { id:"FT68",         name:"Deodorising Unit",                cat:"ift", use:"Research",
+      desc:"Vacuum steam distillation unit, suitable for demonstrating the removal of free fatty acids from edible oils.",
+      experiments:["Operation of small-scale version of the industrial process","Determination of optimum process conditions for different oil types","Effect of variation of process temperature, pressure and process time"],
+      related:["FT18","FT74XA"] },  
+    { id:"FT74XA",       name:"HTST/UHT System",                       cat:"ift", use:"Research",
+      desc:"HTST / UHT processing system covering heat treatment of liquid foods.",
+      experiments:["HTST vs UHT comparison","Regeneration efficiency","Product-quality trials"],
+      related:["FT74XA","FT94X"] },
+    { id:"FT80",         name:"Tall Form Spray Dryer",                 cat:"ift", use:"Research",
+      desc:"Tall-form laboratory spray dryer for products requiring longer drying residence time.",
+      experiments:["Extended residence drying","Powder morphology","Yield optimisation"],
+      related:["FT30-MKIII"] },
+    { id:"FT83XA",       name:"Sterile Filling System",                cat:"ift", use:"Research",
+      desc:"Sterile / aseptic filling system for liquid-food pilot trials.",
+      experiments:["Aseptic filling trials","Sterility validation","Integration with UHT"],
+      related:["FT74XA","FT85"] },
+    { id:"FT91",         name:"Homogenisation Sub-System",             cat:"ift", use:"Research",
+      desc:"Alternate-spec homogenisation sub-system for smaller pilot lines.",
+      experiments:["High-pressure emulsification","Particle size analysis"],
+      related:["FT90"] },
+    { id:"FT94LT",       name:"HTST/UHT Mini Pilot System",            cat:"ift", use:"Research",
+      desc:"Compact mini-pilot HTST / UHT system for very small-scale trials.",
+      experiments:["Mini-pilot HTST","Product development trials","Regeneration efficiency"],
+      related:["FT94X","FT74XA"] },
+    { id:"FT94X",        name:"HTST/UHT Mini Pilot System",            cat:"ift", use:"Research",
+      desc:"Mini-pilot HTST / UHT system with extended process monitoring capability.",
+      experiments:["Mini-pilot process trials","Advanced process monitoring","Regeneration / cooling sections"],
+      related:["FT94LT","FT74XA"] },
+    { id:"FT110DP",      name:"Rapid Extractor",                       cat:"ift", use:"Research",
+      desc:"Rapid extractor for high-throughput laboratory-scale extraction studies.",
+      experiments:["Rapid solvent extraction","Yield comparison","Scale-up studies"],
+      related:["FT111X"] },
+    { id:"FT111X",       name:"Laboratory-Scale Rapid Extractor",      cat:"ift", use:"Research",
+      desc:"Smaller laboratory-scale rapid extractor for formulation development.",
+      experiments:["Small-sample extraction","Yield optimisation","Formulation screening"],
+      related:["FT110DP"] },
+    { id:"FT140X",       name:"Mixing Vessels",                        cat:"ift", use:"Research",
+      desc:"Jacketed mixing vessels for multipurpose liquid-food formulation trials.",
+      experiments:["Batch formulation","Jacketed heating / cooling","Mixing-speed effects"],
+      related:[""] },
+    { id:"UOP10",      name:"Laboratory Steam Generator",                  cat:"ift", use:"Research",
+      desc:"Compact steam generator providing laboratory-scale steam for unit operations experiments.",
+      experiments:["Steam generation capacity","Superheat vs wet steam","Auxiliary for UOP rigs"],
+      related:[""] },
+    // CA Series – Control & Acquisition
+    { id:"CA-armBUS", name:"armBUS Hardware/Software Control & Acquisition Systems", cat:"daq", use:"Teaching",
+      desc:"Hardware and software control and acquisition systems used across Armfield computer-controlled equipment.",
+      experiments:["Multi-channel data logging","PID loop implementation","Export to CSV / MATLAB"],
+      related:["HT10X","CEXC","PCT23MKII"] },
+    { id:"CA-armSOFT", name:"armSOFT Control & Acquisition", cat:"daq", use:"Teaching",
+      desc:"Data-acquisition and control software suite used across Armfield computer-controlled equipment.",
+      experiments:["Multi-channel data logging","PID loop implementation","Export to CSV / MATLAB"],
+      related:["HT10X","CEXC","PCT23MKII"] },
+
+    // ============== RE Series – Renewable Energy ==============
+    { id:"RE10", name:"Advanced Photovoltaic Energy", cat:"renewable-energy", use:"Teaching",
+      desc:"Self-contained modular system covering the fundamentals of photovoltaics, PV system components and solar cell electrical characteristics.",
+      experiments:["Solar cell I-V characteristics and fill factor","Maximum power point (MPP) tracking","Effect of angle, shading and temperature on output","Off-grid PV system design and operation","PWM regulator and deep discharge protection"],
+      related:["RE12","RE18"] },
+    { id:"RE12", name:"Advanced Wind Energy", cat:"renewable-energy", use:"Teaching",
+      desc:"Modular wind energy system for studying turbine characteristics, power conversion and the effect of blade geometry on performance.",
+      experiments:["Wind speed influence on power output","Rotor blade shape and pitch angle effects","Blade number comparison (2, 3, 4 configurations)","Savonius rotor vs horizontal-axis turbine","Energy efficiency calculations"],
+      related:["RE10","RE18"] },
+    { id:"RE14", name:"Advanced Fuel Cell Technology", cat:"renewable-energy", use:"Teaching",
+      desc:"Educational fuel cell system covering hydrogen production via electrolysis and electrical power generation via PEM fuel cells.",
+      experiments:["Electrolyser I-V characteristics","Fuel cell I-V characteristics and power curves","Hydrogen production and storage","Effect of load on fuel cell performance","Fuel cell vs battery energy comparison"],
+      related:["RE18","RE24"] },
+    { id:"RE16", name:"Advanced Thermal Energy", cat:"renewable-energy", use:"Teaching",
+      desc:"Modular solar thermal system featuring parabolic reflectors, Fresnel lenses and thermoelectric generators for exploring heat-to-electricity conversion.",
+      experiments:["Parabolic trough collector performance","Fresnel lens focusing and heat transfer","Thermoelectric generator power output","Thermosiphon vs pump-driven circulation","Convection, conduction and insulation studies"],
+      related:["RE10","RE18"] },
+    { id:"RE18", name:"Advanced Smart Grid Technology", cat:"renewable-energy", use:"Teaching",
+      desc:"Modular smart grid laboratory enabling students to model the complex interactions between renewable sources, energy storage and consumers.",
+      experiments:["PV and wind fluctuation management","Grid stability with and without storage","Electric vehicle integration","Voltage behaviour in distribution networks","Smart transformer and conductor management"],
+      related:["RE10","RE12","RE24"] },
+    { id:"RE20", name:"Biofuel", cat:"renewable-energy", use:"Teaching",
+      desc:"Portable kit demonstrating the complete biofuel production cycle — from raw plant materials to electrical energy — via bioethanol and biodiesel.",
+      experiments:["Biodiesel (FAME) production from fats and oils","Fermentation and CO₂ detection","Distillation of fermented mash","Ethanol fuel cell energy conversion","Temperature effects on reaction rate"],
+      related:["RE22"] },
+    { id:"RE22", name:"BioEnergy", cat:"renewable-energy", use:"Teaching",
+      desc:"Self-contained biomass cycle system covering plant growth, composting and anaerobic digestion for hydrogen and methane production.",
+      experiments:["Plant germination and hydroculture growth","Aerobic biomass degradation (composting)","Anaerobic digestion producing hydrogen","Anaerobic digestion producing methane","Water and nutrient consumption analysis"],
+      related:["RE20"] },
+    { id:"RE24", name:"Advanced Battery Technology", cat:"renewable-energy", use:"Teaching",
+      desc:"Educational energy storage system covering lithium-iron-phosphate battery operation, capacitor behaviour and integration with renewable energy sources.",
+      experiments:["Battery charge and discharge characteristics","Capacitor charge and discharge cycles","State of charge monitoring","Battery integration with PV and wind sources","Energy storage efficiency analysis"],
+      related:["RE18","RE14"] },
+    { id:"RE26", name:"Hydropower", cat:"renewable-energy", use:"Teaching",
+      desc:"Modular hydropower system with three interchangeable turbines (Pelton, Crossflow, Water Wheel) for comparing turbine performance and hydropower principles.",
+      experiments:["Flow rate and fall height vs power output","Comparative analysis of Pelton, Crossflow and Water Wheel turbines","Pipe cross-section effects on performance","Volume flow and pressure variation studies","Hydrostatic and fluid dynamic principles"],
+      related:["RE18","FM62-Pelton-Turbines"] },
+
+    // ============== SV Series – Friction ==============
+    { id:"SV900", name:"Friction on an Inclined Plane", cat:"sv-friction", use:"Teaching",
+      desc:"Apparatus for investigating static and kinetic friction on an inclined surface using various material pairs.",
+      experiments:["Coefficient of static and kinetic friction","Effect of surface material on friction","Angle of friction and angle of repose","Friction force vs normal load","Inclined plane mechanical advantage"],
+      related:["SV901","SV904"] },
+    { id:"SV901", name:"Clutch Plate Friction Apparatus", cat:"sv-friction", use:"Teaching",
+      desc:"Educational apparatus for examining friction in clutch plate systems and the torque transmitted under varying clamping forces.",
+      experiments:["Coefficient of friction for clutch facings","Torque transmitted vs clamping force","Effect of contact area on friction torque","Friction material comparison","Wear and friction relationship"],
+      related:["SV907","SV900"] },
+    { id:"SV902", name:"Pivot Friction Apparatus", cat:"sv-friction", use:"Teaching",
+      desc:"Apparatus for studying friction at pivot points, including collar and pivot bearing configurations under axial load.",
+      experiments:["Pivot friction torque measurement","Effect of bearing pressure distribution","Collar vs flat pivot comparison","Friction torque vs load","Lubrication effects on pivot friction"],
+      related:["SV903","SV904"] },
+    { id:"SV903", name:"Journal Friction Apparatus", cat:"sv-friction", use:"Teaching",
+      desc:"Apparatus for investigating friction in journal bearing systems under varying loads and speeds.",
+      experiments:["Journal bearing friction coefficient","Effect of load on bearing friction","Petroff's law verification","Lubrication and viscosity effects","Coefficient of friction vs bearing pressure"],
+      related:["SV902","SV904"] },
+    { id:"SV904", name:"Bearing Friction Apparatus", cat:"sv-friction", use:"Teaching",
+      desc:"Equipment for comparing rolling and sliding friction in different bearing types and analysing the effect of load.",
+      experiments:["Rolling vs sliding friction comparison","Load effects on bearing friction","Bearing efficiency measurement","Friction torque vs rotational speed","Ball vs roller bearing comparison"],
+      related:["SV903","SV902"] },
+    { id:"SV905", name:"Rope Belt Friction Apparatus", cat:"sv-friction", use:"Teaching",
+      desc:"Device for studying rope friction over a cylindrical surface and verifying the capstan (Euler-Eytelwein) equation.",
+      experiments:["Capstan equation verification","Angle of wrap vs tension ratio","Rope material friction coefficients","Self-locking conditions","Mechanical advantage of rope systems"],
+      related:["SV906","SV901"] },
+    { id:"SV906", name:"Friction of Belts Apparatus", cat:"sv-friction", use:"Teaching",
+      desc:"Apparatus for studying belt drive friction, slip and the relationship between tight-side and slack-side tensions.",
+      experiments:["Belt friction coefficient determination","Slack and tight side tension ratio","Creep and slip in belt drives","Effect of belt material on friction","Power transmission efficiency"],
+      related:["SV905","SV901"] },
+    { id:"SV907", name:"Brake Drum Friction Apparatus", cat:"sv-friction", use:"Teaching",
+      desc:"Apparatus for examining friction in brake drum systems and measuring braking torque under varying loads.",
+      experiments:["Brake torque vs applied load","Coefficient of friction for brake linings","Band brake analysis","Braking efficiency measurement","Effect of contact angle on braking torque"],
+      related:["SV901","SD-1-59"] },
+
+    // ============== SV Series – Strength of Materials ==============
+    { id:"SV800", name:"Rotating Fatigue Machine", cat:"sv-materials", use:"Teaching",
+      desc:"Machine for generating S-N curves and studying fatigue failure of rotating specimens under cyclic bending stress.",
+      experiments:["S-N curve (Wöhler curve) generation","Endurance limit determination","Effect of stress concentration on fatigue life","Fatigue failure surface examination","Mean stress effects on fatigue"],
+      related:["SV802","SV804"] },
+    { id:"SV801", name:"Unsymmetrical Cantilever Apparatus", cat:"sv-materials", use:"Teaching",
+      desc:"Apparatus for investigating deflection of beams with unsymmetrical cross-sections and locating principal axes.",
+      experiments:["Deflection of unsymmetrical beam sections","Principal axes location by experiment","Shear centre determination","Bending about non-principal axes","Comparison with theoretical predictions"],
+      related:["SV807","SV808"] },
+    { id:"SV802", name:"Torsion Testing Machine 30Nm", cat:"sv-materials", use:"Teaching",
+      desc:"Machine for applying controlled torque to specimens and measuring the resulting angle of twist to determine shear modulus.",
+      experiments:["Modulus of rigidity (G) determination","Angle of twist vs applied torque","Torsional shear stress distribution","Polar second moment of area","Comparison of solid and hollow shafts"],
+      related:["SV807","SV800"] },
+    { id:"SV803", name:"Creep Testing Machine", cat:"sv-materials", use:"Teaching",
+      desc:"Apparatus for studying time-dependent deformation of materials under constant stress at elevated temperatures.",
+      experiments:["Primary, secondary and tertiary creep stages","Creep rate vs applied stress","Temperature effects on creep behaviour","Creep rupture time estimation","Material creep resistance comparison"],
+      related:["SV805","SV800"] },
+    { id:"SV804", name:"Pendulum Impact Tester 25J", cat:"sv-materials", use:"Teaching",
+      desc:"Pendulum impact testing machine with 25 J energy capacity for Charpy and Izod impact testing of notched specimens.",
+      experiments:["Charpy impact energy measurement","Izod impact testing","Notch sensitivity of materials","Ductile vs brittle fracture behaviour","Effect of temperature on impact energy"],
+      related:["SV800","SV805"] },
+    { id:"SV805", name:"Universal Materials Tester 35kN", cat:"sv-materials", use:"Teaching",
+      desc:"Versatile 35 kN capacity testing machine for tensile, compressive and bend testing of a wide range of materials.",
+      experiments:["Tensile test and stress-strain curve","Young's modulus determination","Yield strength and ultimate tensile strength","Three-point and four-point bend testing","Compressive strength of materials"],
+      related:["SV802","SV804"] },
+    { id:"SV807", name:"Torsion & Deflection Testing Apparatus", cat:"sv-materials", use:"Teaching",
+      desc:"Apparatus for studying combined torsion and bending, beam deflection and torsional stiffness of structural members.",
+      experiments:["Beam deflection under point and distributed loads","Torsional stiffness measurement","Combined torsion and bending analysis","Macaulay's method verification","Effect of cross-section on deflection"],
+      related:["SV802","SV801"] },
+    { id:"SV808", name:"Extension of Springs Apparatus", cat:"sv-materials", use:"Teaching",
+      desc:"Apparatus for studying the elastic behaviour of springs and verifying Hooke's Law for series and parallel spring arrangements.",
+      experiments:["Hooke's Law verification","Spring stiffness (spring constant) measurement","Series and parallel spring combinations","Elastic potential energy stored in a spring","Effect of wire diameter and coil geometry"],
+      related:["SV801","SV807"] },
+
+    // ============== SV Series – Theory of Machines ==============
+    { id:"SD-1-50", name:"Wheel and Axle", cat:"sv-machines", use:"Teaching",
+      desc:"Classic simple machine demonstrating the relationship between effort and load through mechanical advantage of a wheel and axle.",
+      experiments:["Mechanical advantage calculation","Velocity ratio determination","Efficiency of the simple machine","Effort vs load relationship","Law of machine verification"],
+      related:["SD-1-51","SD-1-58"] },
+    { id:"SD-1-51", name:"Wheel and Differential Axle Apparatus", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus demonstrating the enhanced mechanical advantage achieved with a differential axle configuration.",
+      experiments:["Differential mechanical advantage","Velocity ratio vs load","Machine efficiency measurement","Comparison with simple wheel and axle","Ideal vs actual mechanical advantage"],
+      related:["SD-1-50","SD-1-58"] },
+    { id:"SD-1-52", name:"Efficiency of Screw Threads", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus for measuring the efficiency of various screw thread forms and investigating self-locking conditions.",
+      experiments:["Thread efficiency vs lead angle","Self-locking condition determination","Effort to raise and lower a load","Effect of thread pitch on efficiency","Friction angle and thread geometry"],
+      related:["SD-1-50","SD-1-53"] },
+    { id:"SD-1-53", name:"Gear Tooth Form Apparatus", cat:"sv-machines", use:"Teaching",
+      desc:"Equipment for studying gear tooth geometry, pitch circle relationships and the involute tooth profile.",
+      experiments:["Module, pitch and tooth geometry","Pitch circle and base circle relationship","Involute profile verification","Gear ratio and speed calculation","Contact ratio determination"],
+      related:["SD-1-56","SD-1-63"] },
+    { id:"SD-1-54", name:"Cam and Follower Apparatus", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus for studying the motion characteristics produced by different cam profiles on various follower types.",
+      experiments:["Cam follower displacement diagrams","Velocity and acceleration of followers","Comparison of cam profile types","Effect of base circle radius","Knife-edge vs roller follower comparison"],
+      related:["SD-1-55","SD-1-58"] },
+    { id:"SD-1-55", name:"Simple Flywheel", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus for demonstrating rotational inertia, angular acceleration and the energy storage function of a flywheel.",
+      experiments:["Moment of inertia determination","Angular acceleration under constant torque","Energy stored in rotating flywheel","Effect of mass distribution on inertia","Kinetic energy conversion"],
+      related:["SD-1-60","SD-1-54"] },
+    { id:"SD-1-56", name:"Epicyclic Gear Train", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus demonstrating the operation of planetary (epicyclic) gear systems and their speed and torque ratios.",
+      experiments:["Speed ratio using tabular method","Torque distribution in epicyclic gears","Effect of fixed element on output speed","Comparison with simple gear train","Gear ratio for different input/output combinations"],
+      related:["SD-1-63","SD-1-53"] },
+    { id:"SD-1-57", name:"Castor, Camber and King Pin Inclination", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus for exploring automotive suspension and steering geometry, including castor, camber and king pin inclination angles.",
+      experiments:["Castor angle measurement and effect","Camber angle and tyre wear","King pin inclination and scrub radius","Steering geometry and self-centring","Toe-in and toe-out adjustment"],
+      related:["SD-1-59","SD-1-58"] },
+    { id:"SD-1-58", name:"Relation Between Angular and Linear Speeds", cat:"sv-machines", use:"Teaching",
+      desc:"Educational apparatus demonstrating the relationship between angular velocity and linear velocity in belt, chain and gear drive systems.",
+      experiments:["Angular to linear velocity relationship","Belt drive speed ratios","Chain drive analysis","Gear drive velocity ratio","Pulley size and speed relationship"],
+      related:["SD-1-50","SD-1-54"] },
+    { id:"SD-1-59", name:"Disc Brake Apparatus", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus for studying disc brake principles, braking torque generation and friction coefficient determination.",
+      experiments:["Braking torque vs clamping force","Friction coefficient of brake pads","Pad pressure distribution on disc","Braking efficiency","Effect of pad area on braking performance"],
+      related:["SV907","SD-1-57"] },
+    { id:"SD-1-60", name:"Static & Dynamic Balancing Apparatus", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus for studying the balancing of rotating masses in single and multiple planes to reduce vibration.",
+      experiments:["Static balancing of rotating masses","Dynamic balancing in two planes","Use of balancing diagrams","Residual vibration measurement","Effect of unbalance on bearing forces"],
+      related:["SD-1-55","SD2"] },
+    { id:"SD-1-61", name:"Governor Apparatus", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus demonstrating centrifugal governor mechanisms used for speed regulation in rotating machinery.",
+      experiments:["Watt governor speed-radius characteristic","Hartnell governor spring stiffness","Governor sensitivity and stability","Speed regulation under load variation","Comparison of governor types"],
+      related:["SD-1-55","SD-1-60"] },
+    { id:"SD-1-62", name:"Gear Assembly Unit Combined Drives", cat:"sv-machines", use:"Teaching",
+      desc:"Apparatus showing multiple gear drive configurations including spur, bevel and worm gear combinations.",
+      experiments:["Multi-stage gear ratio calculation","Combined gear drive efficiency","Spur, bevel and worm gear comparison","Torque multiplication through gear trains","Backlash and gear clearance effects"],
+      related:["SD-1-56","SD-1-53"] },
+    { id:"SD-1-63", name:"Single Epicyclic Gear Train", cat:"sv-machines", use:"Teaching",
+      desc:"Simplified planetary gear apparatus for studying single epicyclic gear arrangements and their speed ratios.",
+      experiments:["Planetary gear speed ratio by tabular method","Sun, planet and ring gear relationships","Input/output speed and torque","Velocity ratio for different fixed elements","Comparison with compound epicyclic train"],
+      related:["SD-1-56","SD-1-53"] },
+
+    // ============== SV Series – Vibrations ==============
+    { id:"SD2", name:"Universal Vibration System", cat:"sv-vibrations", use:"Teaching",
+      desc:"Benchtop unit for examining a wide range of free and forced vibrational phenomena and mechanical oscillation characteristics.",
+      experiments:["Free vibration and natural frequency","Forced vibration and resonance","Damping coefficient measurement","Transmissibility vs frequency ratio","Effect of mass and stiffness on natural frequency"],
+      related:["SD3","SD-1-60"] },
+    { id:"SD3", name:"Torsional Vibration Apparatus", cat:"sv-vibrations", use:"Teaching",
+      desc:"Benchtop apparatus for investigating torsion and torsional vibration in shaft-disc systems.",
+      experiments:["Natural frequency of torsional system","Effect of disc inertia on natural frequency","Damping of torsional oscillations","Two-disc and three-disc torsional systems","Node position in torsional vibration"],
+      related:["SD2","SV802"] },
+  ],
+};
+</script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- jsPDF + AutoTable for server-side PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<!-- React + Babel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+// ── Glyphs ──────────────────────────────────────────────────────────────────
+const MajorGlyph = ({ kind, size = 28 }) => {
+  const s = { width: size, height: size, display: 'block' };
+  const stroke = 'currentColor';
+  const common = { fill: 'none', stroke, strokeWidth: 1.4, strokeLinecap: 'round', strokeLinejoin: 'round' };
+  switch (kind) {
+    case 'mech':
+      return (
+        <svg viewBox="0 0 32 32" style={s}>
+          <circle cx="16" cy="16" r="5.5" {...common} />
+          <circle cx="16" cy="16" r="11" {...common} />
+          <path d="M16 3v3M16 26v3M3 16h3M26 16h3M6.5 6.5l2.1 2.1M23.4 23.4l2.1 2.1M6.5 25.5l2.1-2.1M23.4 8.6l2.1-2.1" {...common} />
+        </svg>
+      );
+    case 'chem':
+      return (
+        <svg viewBox="0 0 32 32" style={s}>
+          <path d="M13 4h6M14 4v7L7 25a2 2 0 0 0 1.8 3h14.4A2 2 0 0 0 25 25l-7-14V4" {...common} />
+          <path d="M10.5 19h11" {...common} />
+        </svg>
+      );
+    case 'civil':
+      return (
+        <svg viewBox="0 0 32 32" style={s}>
+          <path d="M3 22h26M3 26h26M6 22V10M16 22V10M26 22V10" {...common} />
+          <path d="M3 10q6.5-6 13 0 6.5-6 13 0" {...common} />
+        </svg>
+      );
+    case 'food':
+      return (
+        <svg viewBox="0 0 32 32" style={s}>
+          <path d="M16 28V8" {...common} />
+          <path d="M16 12c-3-2-5-2-7-1 1 2 3 3 7 3M16 12c3-2 5-2 7-1-1 2-3 3-7 3" {...common} />
+          <path d="M16 18c-3-2-5-2-7-1 1 2 3 3 7 3M16 18c3-2 5-2 7-1-1 2-3 3-7 3" {...common} />
+          <path d="M16 8c-2-1-3-2-4-4 2 0 3 1 4 2 1-1 2-2 4-2-1 2-2 3-4 4z" {...common} />
+        </svg>
+      );
+    case 'env':
+      return (
+        <svg viewBox="0 0 32 32" style={s}>
+          <path d="M16 4c4 5 7 8 7 12a7 7 0 0 1-14 0c0-4 3-7 7-12z" {...common} />
+          <path d="M4 26c2-1 3-1 5 0s3 1 5 0 3-1 5 0 3 1 5 0 3-1 4 0" {...common} />
+        </svg>
+      );
+    case 'mtx':
+      return (
+        <svg viewBox="0 0 32 32" style={s}>
+          <rect x="4" y="4" width="24" height="24" rx="2" {...common} />
+          <rect x="10" y="10" width="12" height="12" rx="1" {...common} />
+          <path d="M16 4v6M16 22v6M4 16h6M22 16h6" {...common} />
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
+
+const PlaceholderImage = ({ label = 'PRODUCT SHOT', tall = false, productId = null }) => {
+  const h = tall ? 380 : 170;
+  const formats = ['png', 'jpg', 'jpeg'];
+  const [fmtIdx, setFmtIdx] = React.useState(0);
+  const allFailed = fmtIdx >= formats.length;
+  const src = productId && !allFailed ? `images/${productId}.${formats[fmtIdx]}` : null;
+  const showImg = !!src;
+  return (
+    <div style={{
+      width: '100%', height: h, background: showImg ? '#ffffff' : 'var(--surface-2)',
+      border: '1px solid var(--hairline)', borderRadius: 6, overflow: 'hidden',
+      position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {showImg ? (
+        <img src={src} alt={label} onError={() => setFmtIdx(i => i + 1)}
+          style={{ maxWidth: '88%', maxHeight: '88%', width: 'auto', height: 'auto', objectFit: 'contain', display: 'block' }} />
+      ) : (
+        <>
+          <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="none"
+            style={{ position: 'absolute', inset: 0, opacity: 0.55 }}>
+            <defs>
+              <pattern id={`s-${label}-${h}`} width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="14" stroke="var(--hairline-strong)" strokeWidth="1" />
+              </pattern>
+            </defs>
+            <rect width="400" height="300" fill={`url(#s-${label}-${h})`} />
+          </svg>
+          <span style={{
+            position: 'relative', fontFamily: 'var(--mono)', fontSize: 10,
+            letterSpacing: '0.12em', color: 'var(--ink-dim)',
+            background: 'var(--surface-1)', padding: '4px 8px', borderRadius: 3,
+            border: '1px solid var(--hairline)',
+          }}>{label}</span>
+        </>
+      )}
+    </div>
+  );
+};
+
+// ── Shared UI ────────────────────────────────────────────────────────────────
+const { useState, useMemo, useEffect } = React;
+
+const Chip = ({ children, tone = 'neutral', onClick, active }) => {
+  const base = {
+    display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 9px',
+    borderRadius: 999, fontSize: 11, lineHeight: 1.4, letterSpacing: '0.01em',
+    fontFamily: 'var(--sans)', cursor: onClick ? 'pointer' : 'default',
+    transition: 'all 160ms ease', userSelect: 'none',
+  };
+  const tones = {
+    neutral:  { color: 'var(--ink-dim)', background: 'var(--surface-2)', border: '1px solid var(--hairline)' },
+    accent:   { color: 'var(--accent)', background: 'var(--accent-wash)', border: '1px solid var(--accent-border)' },
+    teach:    { color: 'oklch(40% 0.14 44)',  background: 'oklch(97% 0.03 44)',  border: '1px solid oklch(87% 0.07 44)' },
+    research: { color: 'oklch(35% 0.08 265)', background: 'oklch(95% 0.03 265)', border: '1px solid oklch(84% 0.05 265)' },
+    code:     { color: 'var(--ink)', background: 'var(--surface-2)', border: '1px solid var(--hairline)', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: 0 },
+  };
+  const activeBoost = active ? { background: 'var(--ink)', color: 'var(--bg)', borderColor: 'var(--ink)' } : null;
+  return (
+    <span style={{ ...base, ...tones[tone], ...activeBoost }} onClick={onClick}>
+      {children}
+    </span>
+  );
+};
+
+const Crumb = ({ items }) => (
+  <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--ink-dim)', fontFamily: 'var(--sans)', flexWrap: 'wrap' }}>
+    {items.map((it, i) => (
+      <React.Fragment key={i}>
+        {i > 0 && <span style={{ color: 'var(--hairline-strong)' }}>/</span>}
+        {it.onClick ? (
+          <button onClick={it.onClick} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--ink-dim)', fontSize: 13, fontFamily: 'inherit' }}
+            onMouseEnter={e => e.currentTarget.style.color = 'var(--ink)'}
+            onMouseLeave={e => e.currentTarget.style.color = 'var(--ink-dim)'}>
+            {it.label}
+          </button>
+        ) : (
+          <span style={{ color: 'var(--ink)' }}>{it.label}</span>
+        )}
+      </React.Fragment>
+    ))}
+  </nav>
+);
+
+// ── Landing ──────────────────────────────────────────────────────────────────
+const SearchResults = ({ hits, onJumpProduct, query }) => (
+  <div>
+    <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.14em', color: 'var(--ink-dim)', marginBottom: 14 }}>
+      {hits.length} RESULT{hits.length === 1 ? '' : 'S'} FOR "{query.toUpperCase()}"
+    </div>
+    {hits.length === 0 ? (
+      <div style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--ink-dim)', border: '1px dashed var(--hairline)', borderRadius: 10, fontFamily: 'var(--sans)', fontSize: 14 }}>
+        No products match. Try a series prefix (F, HT, UOP, PCT, W, FT…).
+      </div>
+    ) : (
+      <div style={{ border: '1px solid var(--hairline)', borderRadius: 10, overflow: 'hidden' }}>
+        {hits.map((p, i) => (
+          <button key={p.id} onClick={() => onJumpProduct(p.id)}
+            className="search-result-row" style={{ width: '100%', display: 'grid', gridTemplateColumns: '140px 1fr auto', gap: 20, padding: '16px 20px', background: 'var(--bg)', border: 'none', borderTop: i > 0 ? '1px solid var(--hairline)' : 'none', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', alignItems: 'center', transition: 'background 140ms' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-1)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg)'}>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--ink)' }}>{p.id}</span>
+            <span style={{ fontSize: 14, color: 'var(--ink)' }}>{p.name}</span>
+            <Chip tone={p.use === 'Teaching' ? 'teach' : 'research'}>{p.use}</Chip>
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+const MajorCard = ({ major, data, onClick }) => {
+  const [hover, setHover] = useState(false);
+  const catCount = major.categories.length;
+  const productCount = data.products.filter(p => major.categories.includes(p.cat)).length;
+  return (
+    <button onClick={onClick}
+      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{ background: hover ? 'var(--surface-1)' : 'var(--bg)', border: 'none', padding: '28px 26px 24px', textAlign: 'left', cursor: 'pointer', transition: 'background 160ms', display: 'flex', flexDirection: 'column', gap: 14, minHeight: 180, fontFamily: 'inherit' }}>
+      <div style={{ width: 44, height: 44, borderRadius: 8, background: hover ? 'var(--accent-wash)' : 'var(--surface-2)', color: hover ? 'var(--accent)' : 'var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 160ms' }}>
+        <MajorGlyph kind={major.glyph} size={26} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontFamily: 'var(--display)', fontSize: 19, fontWeight: 500, color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: 4 }}>{major.name}</div>
+        <div style={{ fontSize: 13, color: 'var(--ink-mid)', lineHeight: 1.4 }}>{major.blurb}</div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.1em', color: 'var(--ink-dim)' }}>
+        <span>{catCount} CATEGORIES · {productCount} PRODUCTS</span>
+        <span style={{ transform: hover ? 'translateX(4px)' : 'translateX(0)', transition: 'transform 180ms' }}>→</span>
+      </div>
+    </button>
+  );
+};
+
+const Landing = ({ onPickMajor, data, query, setQuery, filter, setFilter, onJumpProduct }) => {
+  const hits = useMemo(() => {
+    if (!query.trim()) return null;
+    const q = query.toLowerCase();
+    return data.products.filter(p =>
+      p.id.toLowerCase().includes(q) || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)
+    ).slice(0, 8);
+  }, [query, data.products]);
+
+  return (
+    <div className="fade-in page-pad" style={{ maxWidth: 1120, margin: '0 auto', padding: '72px 48px 96px' }}>
+      <div style={{ marginBottom: 56 }}>
+
+        {/* Logos row — Armfield left, Medicom right */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <img src="images/armfield-logo.png" alt="Armfield" style={{ height: 44, width: 'auto', display: 'block', background: '#1d2657', padding: '6px 14px', borderRadius: 8 }} />
+          <img src="images/company-logo.png" alt="Medicom" style={{ height: 64, width: 'auto', display: 'block' }} />
+        </div>
+
+        {/* Text block */}
+        <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--ink-dim)', marginBottom: 18 }}>
+          ARMFIELD · TEACHING &amp; RESEARCH EQUIPMENT CATALOGUE
+        </div>
+        <h1 className="hero-h1" style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 56, lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 16px', color: 'var(--ink)', maxWidth: 820 }}>
+          Find the right lab equipment for your discipline.
+        </h1>
+        <p style={{ fontSize: 18, lineHeight: 1.5, color: 'var(--ink-mid)', fontFamily: 'var(--sans)', margin: 0, maxWidth: 640 }}>
+          Select your field to drill into relevant product categories and specific teaching or research models.
+        </p>
+
+      </div>
+
+      <div style={{ display: 'flex', gap: 12, marginBottom: 40, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 360px', minWidth: 260, position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ position: 'absolute', left: 14, color: 'var(--ink-dim)' }}>
+            <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.4" />
+            <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          </svg>
+          <input value={query} onChange={e => setQuery(e.target.value)}
+            placeholder="Search by model number or keyword — e.g. HT10X, distillation, pasteuriser"
+            style={{ width: '100%', height: 44, padding: '0 14px 0 40px', background: 'var(--surface-1)', border: '1px solid var(--hairline)', borderRadius: 8, fontSize: 14, fontFamily: 'var(--sans)', color: 'var(--ink)', outline: 'none', transition: 'border-color 160ms' }}
+            onFocus={e => e.currentTarget.style.borderColor = 'var(--accent-border)'}
+            onBlur={e => e.currentTarget.style.borderColor = 'var(--hairline)'} />
+        </div>
+        <div style={{ display: 'flex', gap: 2, padding: 2, background: 'var(--surface-2)', border: '1px solid var(--hairline)', borderRadius: 8 }}>
+          {['All', 'Teaching', 'Research'].map(f => (
+            <button key={f} onClick={() => setFilter(f)} style={{ padding: '8px 14px', borderRadius: 6, border: 'none', background: filter === f ? 'var(--bg)' : 'transparent', color: filter === f ? 'var(--ink)' : 'var(--ink-dim)', fontFamily: 'var(--sans)', fontSize: 13, cursor: 'pointer', boxShadow: filter === f ? '0 1px 2px rgba(0,0,0,0.04)' : 'none', transition: 'all 140ms' }}>{f}</button>
+          ))}
+        </div>
+      </div>
+
+      {hits ? (
+        <SearchResults hits={hits} onJumpProduct={onJumpProduct} query={query} />
+      ) : (
+        <>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.14em', color: 'var(--ink-dim)', marginBottom: 14 }}>
+            DISCIPLINE ({data.majors.length})
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 1, background: 'var(--hairline)', border: '1px solid var(--hairline)', borderRadius: 10, overflow: 'hidden' }}>
+            {data.majors.map(m => (
+              <MajorCard key={m.id} major={m} data={data} onClick={() => onPickMajor(m.id)} />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+// ── Categories ───────────────────────────────────────────────────────────────
+const CategoryCard = ({ cat, onClick }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <button onClick={onClick}
+      onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      disabled={cat.count === 0}
+      style={{ width: '100%', textAlign: 'left', padding: '20px 22px', borderRadius: 10, border: '1px solid var(--hairline)', background: hover && cat.count > 0 ? 'var(--surface-1)' : 'var(--bg)', cursor: cat.count === 0 ? 'default' : 'pointer', opacity: cat.count === 0 ? 0.45 : 1, transition: 'all 160ms', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', gap: 16, minHeight: 128, transform: hover && cat.count > 0 ? 'translateY(-1px)' : 'translateY(0)', boxShadow: hover && cat.count > 0 ? '0 2px 10px rgba(0,0,0,0.04)' : 'none' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ fontFamily: 'var(--display)', fontSize: 17, fontWeight: 500, color: 'var(--ink)', letterSpacing: '-0.005em', marginBottom: 4 }}>{cat.name}</div>
+          <Chip tone="code">{cat.series}</Chip>
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.1em', color: 'var(--ink-dim)', marginTop: 'auto' }}>
+        <span>{cat.count} PRODUCT{cat.count === 1 ? '' : 'S'}</span>
+        {cat.count > 0 && <span style={{ transform: hover ? 'translateX(4px)' : 'translateX(0)', transition: 'transform 180ms' }}>→</span>}
+      </div>
+    </button>
+  );
+};
+
+const Categories = ({ major, data, onBack, onPickCategory, filter }) => {
+  const cats = major.categories.map(cid => ({
+    id: cid, ...data.categories[cid],
+    count: data.products.filter(p => p.cat === cid && (filter === 'All' || p.use === filter)).length,
+  }));
+  return (
+    <div className="fade-in page-pad" style={{ maxWidth: 1120, margin: '0 auto', padding: '40px 48px 96px' }}>
+      <Crumb items={[{ label: 'All disciplines', onClick: onBack }, { label: major.name }]} />
+      <div style={{ margin: '28px 0 40px', display: 'flex', gap: 18, alignItems: 'flex-start' }}>
+        <div style={{ width: 56, height: 56, borderRadius: 10, background: 'var(--accent-wash)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <MajorGlyph kind={major.glyph} size={32} />
+        </div>
+        <div>
+          <h1 style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 36, letterSpacing: '-0.02em', margin: '0 0 6px', color: 'var(--ink)' }}>{major.name}</h1>
+          <p style={{ fontSize: 15, color: 'var(--ink-mid)', margin: 0 }}>{cats.length} categories · choose a product family to continue</p>
+        </div>
+      </div>
+      <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.14em', color: 'var(--ink-dim)', marginBottom: 14 }}>CATEGORIES</div>
+      <div className="cat-grid">
+        {cats.map(c => <CategoryCard key={c.id} cat={c} onClick={() => onPickCategory(c.id)} />)}
+      </div>
+    </div>
+  );
+};
+
+// ── Products ─────────────────────────────────────────────────────────────────
+const ProductCard = ({ product, onClick, onAddToQuote, inCart }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <div onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      style={{ borderRadius: 10, border: '1px solid var(--hairline)', background: 'var(--bg)', overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'all 180ms', transform: hover ? 'translateY(-2px)' : 'translateY(0)', boxShadow: hover ? '0 8px 24px rgba(0,0,0,0.06)' : '0 1px 0 rgba(0,0,0,0.02)', cursor: 'pointer' }}>
+      <PlaceholderImage label={product.id} productId={product.id} />
+      <div style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+          <span style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-dim)', letterSpacing: '0.04em' }}>{product.id}</span>
+          <Chip tone={product.use === 'Teaching' ? 'teach' : 'research'}>{product.use}</Chip>
+        </div>
+        <div style={{ fontFamily: 'var(--display)', fontSize: 17, fontWeight: 500, color: 'var(--ink)', letterSpacing: '-0.005em', lineHeight: 1.25 }}>{product.name}</div>
+        <div style={{ fontSize: 13, color: 'var(--ink-mid)', lineHeight: 1.5, flex: 1 }}>{product.desc}</div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <div style={{ flex: 1, padding: '9px 14px', borderRadius: 6, background: hover ? 'var(--ink)' : 'var(--surface-2)', color: hover ? 'var(--bg)' : 'var(--ink)', border: '1px solid ' + (hover ? 'var(--ink)' : 'var(--hairline)'), fontSize: 13, transition: 'all 160ms', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>View details</span><span>→</span>
+          </div>
+          <button onClick={e => { e.stopPropagation(); onAddToQuote(product.id); }} title={inCart ? 'Added to quote' : 'Add to quote'}
+            style={{ padding: '9px 12px', borderRadius: 6, border: '1px solid ' + (inCart ? 'var(--orange)' : 'var(--hairline)'), background: inCart ? 'var(--orange)' : 'var(--bg)', color: inCart ? '#fff' : 'var(--ink-dim)', cursor: 'pointer', transition: 'all 160ms', fontSize: 15 }}>
+            {inCart ? '✓' : '+'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Products = ({ major, category, data, filter, onBack, onBackToMajor, onPickProduct, onAddToQuote, inCart }) => {
+  const products = data.products.filter(p => p.cat === category.id && (filter === 'All' || p.use === filter));
+  const allInCat = data.products.filter(p => p.cat === category.id);
+  return (
+    <div className="fade-in page-pad" style={{ maxWidth: 1120, margin: '0 auto', padding: '40px 48px 96px' }}>
+      <Crumb items={[{ label: 'All disciplines', onClick: onBack }, { label: major.name, onClick: onBackToMajor }, { label: category.name }]} />
+      <div style={{ margin: '28px 0 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <h1 style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 36, letterSpacing: '-0.02em', margin: '0 0 8px', color: 'var(--ink)' }}>{category.name}</h1>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <Chip tone="code">{category.series}</Chip>
+            <Chip>{category.tag}</Chip>
+          </div>
+        </div>
+        <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-dim)', letterSpacing: '0.08em' }}>
+          {products.length} / {allInCat.length} SHOWN{filter !== 'All' && <span> · FILTERED: {filter.toUpperCase()}</span>}
+        </div>
+      </div>
+      {products.length === 0 ? (
+        <div style={{ padding: '64px 24px', textAlign: 'center', color: 'var(--ink-dim)', border: '1px dashed var(--hairline)', borderRadius: 10 }}>
+          No {filter.toLowerCase()} products in this category.
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+          {products.map(p => <ProductCard key={p.id} product={p} onClick={() => onPickProduct(p.id)} onAddToQuote={onAddToQuote} inCart={inCart(p.id)} />)}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Product Detail ────────────────────────────────────────────────────────────
+const DetailMeta = ({ k, v }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <span style={{ fontFamily: 'var(--mono)', fontSize: 9, letterSpacing: '0.14em', color: 'var(--ink-dim)', textTransform: 'uppercase' }}>{k}</span>
+    <span style={{ fontSize: 13, color: 'var(--ink)' }}>{v}</span>
+  </div>
+);
+
+const Section = ({ title, children }) => (
+  <section>
+    <h3 style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 14, letterSpacing: '-0.005em', margin: '0 0 12px', color: 'var(--ink)' }}>{title}</h3>
+    {children}
+  </section>
+);
+
+const ProductDetail = ({ product, data, onBackHome, onBackToMajor, onBackToCategory, onPickProduct, onRequestQuote, onAddToQuote, inCart }) => {
+  const cat = data.categories[product.cat];
+  const major = data.majors.find(m => m.categories.includes(product.cat));
+  const related = (product.related || []).map(id => data.products.find(p => p.id === id)).filter(Boolean);
+  return (
+    <div className="fade-in page-pad" style={{ maxWidth: 1120, margin: '0 auto', padding: '40px 48px 96px' }}>
+      <Crumb items={[
+        { label: 'All disciplines', onClick: onBackHome },
+        ...(major ? [{ label: major.name, onClick: onBackToMajor }] : []),
+        { label: cat.name, onClick: onBackToCategory },
+        { label: product.id },
+      ]} />
+      <div className="detail-grid" style={{ marginTop: 36, display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 56, alignItems: 'flex-start' }}>
+        <div>
+          <PlaceholderImage label={product.id + ' · DETAIL'} tall productId={product.id} />
+          <div style={{ marginTop: 18, padding: '14px 16px', borderRadius: 8, background: 'var(--surface-1)', border: '1px solid var(--hairline)', display: 'flex', gap: 20, fontSize: 12, color: 'var(--ink-mid)', fontFamily: 'var(--sans)' }}>
+            <DetailMeta k="Model" v={<span style={{ fontFamily: 'var(--mono)' }}>{product.id}</span>} />
+            <DetailMeta k="Series" v={cat.series} />
+            <DetailMeta k="Intended for" v={product.use} />
+          </div>
+        </div>
+        <div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+            <Chip tone="code">{product.id}</Chip>
+            <Chip>{cat.name}</Chip>
+            <Chip tone={product.use === 'Teaching' ? 'teach' : 'research'}>{product.use}</Chip>
+          </div>
+          <h1 style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 40, letterSpacing: '-0.02em', margin: '0 0 20px', color: 'var(--ink)', lineHeight: 1.1 }}>{product.name}</h1>
+          <p style={{ fontSize: 16, color: 'var(--ink-mid)', lineHeight: 1.55, margin: '0 0 32px' }}>{product.desc}</p>
+          <Section title="Key experiments & applications">
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+              {product.experiments.map((e, i) => (
+                <li key={i} style={{ padding: '11px 0', borderTop: i === 0 ? '1px solid var(--hairline)' : 'none', borderBottom: '1px solid var(--hairline)', display: 'flex', gap: 12, alignItems: 'flex-start', fontSize: 14, color: 'var(--ink)', lineHeight: 1.45 }}>
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--ink-dim)', paddingTop: 2, minWidth: 22, letterSpacing: '0.05em' }}>{String(i + 1).padStart(2, '0')}</span>
+                  <span>{e}</span>
+                </li>
+              ))}
+            </ul>
+          </Section>
+          <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
+            <button
+              onClick={() => onAddToQuote(product.id)}
+              style={{ padding: '11px 18px', borderRadius: 7, background: inCart ? 'var(--orange)' : 'var(--ink)', color: '#fff', border: 'none', fontSize: 14, fontFamily: 'var(--sans)', cursor: 'pointer', transition: 'all 160ms', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>{inCart ? '✓ Added to quote' : '+ Add to quote'}</span>
+            </button>
+            <a
+              href={`datasheets/${product.id}.pdf`}
+              download
+              style={{ padding: '11px 18px', borderRadius: 7, background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--hairline)', fontSize: 14, fontFamily: 'var(--sans)', cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M8 2v8M5 7l3 3 3-3M3 13h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Download datasheet
+            </a>
+          </div>
+        </div>
+      </div>
+      {related.length > 0 && (
+        <div style={{ marginTop: 80 }}>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.14em', color: 'var(--ink-dim)', marginBottom: 14 }}>RELATED PRODUCTS</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+            {related.map(r => (
+              <button key={r.id} onClick={() => onPickProduct(r.id)}
+                style={{ textAlign: 'left', padding: '16px 18px', borderRadius: 8, border: '1px solid var(--hairline)', background: 'var(--bg)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 160ms' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-1)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-dim)', marginBottom: 4 }}>{r.id}</div>
+                <div style={{ fontSize: 14, color: 'var(--ink)', marginBottom: 6 }}>{r.name}</div>
+                <Chip tone={r.use === 'Teaching' ? 'teach' : 'research'}>{r.use}</Chip>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── App ───────────────────────────────────────────────────────────────────────
+// ── Contact Page ──────────────────────────────────────────────────────────────
+const ContactPage = ({ prefillModel, data, onBack }) => {
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({
+    name: '', email: '', company: '',
+    model: prefillModel || '',
+    message: prefillModel
+      ? `I would like to request a quote for the ${prefillModel}.`
+      : '',
+  });
+
+  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(
+      form.model ? `Quote request – ${form.model}` : 'Product enquiry'
+    );
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nCompany: ${form.company}\nModel: ${form.model}\n\n${form.message}`
+    );
+    window.location.href = `mailto:pre-sales@medicom-grp.com?subject=${subject}&body=${body}`;
+    setSubmitted(true);
+  };
+
+  const product = prefillModel ? data.products.find(p => p.id === prefillModel) : null;
+
+  return (
+    <div className="fade-in page-pad" style={{ maxWidth: 760, margin: '0 auto', padding: '40px 48px 96px' }}>
+      <Crumb items={[
+        { label: 'All disciplines', onClick: onBack },
+        ...(product ? [{ label: product.name, onClick: onBack }] : []),
+        { label: 'Request a quote' },
+      ]} />
+
+      <div style={{ marginTop: 32, marginBottom: 40 }}>
+        <h1 style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 36, letterSpacing: '-0.02em', margin: '0 0 10px', color: 'var(--ink)' }}>
+          {prefillModel ? 'Request a quote' : 'Contact us'}
+        </h1>
+        <p style={{ fontSize: 15, color: 'var(--ink-mid)', margin: 0 }}>
+          Fill in the form below and we'll get back to you with pricing and availability.
+        </p>
+      </div>
+
+      {product && (
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '14px 16px', borderRadius: 8, background: 'var(--accent-wash)', border: '1px solid var(--accent-border)', marginBottom: 32 }}>
+          <div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--accent)', marginBottom: 2 }}>{product.id}</div>
+            <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--ink)' }}>{product.name}</div>
+          </div>
+        </div>
+      )}
+
+      {submitted ? (
+        <div style={{ padding: '48px 32px', textAlign: 'center', border: '1px solid var(--hairline)', borderRadius: 10 }}>
+          <div style={{ fontSize: 32, marginBottom: 14 }}>✓</div>
+          <h2 style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 22, margin: '0 0 10px', color: 'var(--ink)' }}>Request sent</h2>
+          <p style={{ fontSize: 14, color: 'var(--ink-mid)', margin: '0 0 24px' }}>Your email client should have opened. We'll be in touch shortly.</p>
+          <button onClick={onBack} style={{ padding: '10px 20px', borderRadius: 7, background: 'var(--ink)', color: 'var(--bg)', border: 'none', fontFamily: 'var(--sans)', fontSize: 14, cursor: 'pointer' }}>
+            Back to products
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div className="contact-name-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="form-field">
+              <label>NAME *</label>
+              <input required value={form.name} onChange={set('name')} placeholder="Jane Smith" />
+            </div>
+            <div className="form-field">
+              <label>EMAIL *</label>
+              <input required type="email" value={form.email} onChange={set('email')} placeholder="jane@university.edu" />
+            </div>
+          </div>
+          <div className="form-field">
+            <label>COMPANY / INSTITUTION</label>
+            <input value={form.company} onChange={set('company')} placeholder="University of …" />
+          </div>
+          <div className="form-field">
+            <label>MODEL / PRODUCT *</label>
+            <input required value={form.model} onChange={set('model')} placeholder="e.g. HT10XC" />
+          </div>
+          <div className="form-field">
+            <label>MESSAGE *</label>
+            <textarea required value={form.message} onChange={set('message')} placeholder="Tell us what you need…" />
+          </div>
+          <div style={{ display: 'flex', gap: 12, paddingTop: 4 }}>
+            <button type="submit" style={{ padding: '11px 24px', borderRadius: 7, background: 'var(--ink)', color: 'var(--bg)', border: 'none', fontSize: 14, fontFamily: 'var(--sans)', cursor: 'pointer' }}>
+              Send request
+            </button>
+            <button type="button" onClick={onBack} style={{ padding: '11px 18px', borderRadius: 7, background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--hairline)', fontSize: 14, fontFamily: 'var(--sans)', cursor: 'pointer' }}>
+              Cancel
+            </button>
+          </div>
+          <p style={{ fontSize: 12, color: 'var(--ink-dim)', margin: 0 }}>
+            * Required. Submitting opens your email client — no data is sent to a server.
+          </p>
+        </form>
+      )}
+    </div>
+  );
+};
+
+// ── App ───────────────────────────────────────────────────────────────────────
+// ── Quote price calculation (mirrors Excel formula chain) ──────────────────
+function calcQuotePrice(gbpPrice, qty, p) {
+  const costAed    = gbpPrice * qty * p.gbpToAed;
+  const withOps    = costAed   * (1 + p.operationPct);
+  const withProfit = withOps   * (1 + p.profitPct);
+  const afterDisc  = withProfit * (1 - p.discountPct);
+  const withCust   = afterDisc * (1 + p.customsPct);
+  return { unitAed: withCust / qty, totalAed: withCust };
+}
+function fmtAed(n) {
+  return 'AED ' + n.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtGbp(n) {
+  return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ── PDF generation (jsPDF) — customer never sees this ─────────────────────
+function generateQuotePDF(quoteNo, customer, lineItems, subtotal, shipping, vat, grandTotal, vatPct, hasPrices) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const navy = [29, 38, 87], orange = [240, 112, 0];
+  const W = 210, M = 18;
+  let y = 18;
+
+  // ── Header ──
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(...navy);
+  doc.text('Medicom Scientific Equipment Trading LLC', M, y);
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(...orange);
+  doc.text('QUOTATION', W - M, y, { align: 'right' });
+
+  y += 6;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110, 110, 110);
+  doc.text('Musaffah Industrial Area, Block 3 – Plot 1 – Office 17', M, y); y += 4.5;
+  doc.text('Phone: +971 67 454 194  |  www.medicom-grp.com  |  pre-sales@medicom-grp.com', M, y);
+
+  // Quote meta (right column)
+  const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  let qy = 24;
+  [['Quote No:', quoteNo], ['Date:', dateStr], ['Valid for:', '30 days'], ['Currency:', 'AED']].forEach(([k, v]) => {
+    doc.setTextColor(140, 140, 140); doc.text(k, W - M - 28, qy, { align: 'right' });
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(...navy); doc.text(v, W - M, qy, { align: 'right' });
+    doc.setFont('helvetica', 'normal'); qy += 5;
+  });
+
+  y += 7;
+  doc.setDrawColor(...orange); doc.setLineWidth(0.8); doc.line(M, y, W - M, y); y += 8;
+
+  // ── Customer ──
+  doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(140, 140, 140);
+  doc.text('SOLD TO', M, y); y += 5;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(40, 40, 40);
+  doc.text(customer.company || customer.name, M, y); y += 5;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+  if (customer.company) { doc.text(customer.name, M, y); y += 4.5; }
+  doc.text(customer.email, M, y); y += 4.5;
+  if (customer.phone) { doc.text(customer.phone, M, y); y += 4.5; }
+  const loc = [customer.city, customer.country].filter(Boolean).join(', ');
+  if (loc) { doc.text(loc, M, y); y += 4.5; }
+  y += 4;
+
+  // ── Products table ──
+  const fmt = n => n.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  doc.autoTable({
+    startY: y,
+    head: [['#', 'Model', 'Description', 'Qty', 'Unit Price (AED)', 'Amount (AED)']],
+    body: lineItems.map((li, i) => [
+      String(i + 1).padStart(2, '0'),
+      li.prod.id,
+      li.prod.name,
+      String(li.qty),
+      li.hasPrice ? fmt(li.calc.unitAed) : 'On request',
+      li.hasPrice ? fmt(li.calc.totalAed) : '—',
+    ]),
+    margin: { left: M, right: M },
+    headStyles: { fillColor: navy, textColor: [255,255,255], fontSize: 8, fontStyle: 'bold', halign: 'left' },
+    bodyStyles: { fontSize: 9, textColor: [40,40,40] },
+    columnStyles: {
+      0: { cellWidth: 10 }, 1: { cellWidth: 24 }, 2: { cellWidth: 'auto' },
+      3: { cellWidth: 12, halign: 'center' },
+      4: { cellWidth: 34, halign: 'right' }, 5: { cellWidth: 34, halign: 'right' },
+    },
+    alternateRowStyles: { fillColor: [248, 249, 252] },
+  });
+
+  y = doc.lastAutoTable.finalY + 8;
+
+  // ── Totals ──
+  if (hasPrices) {
+    const tx = W - M - 82;
+    [['Subtotal', fmt(subtotal)], ['Shipping & Handling', fmt(Number(shipping))], [`VAT (${vatPct*100}%)`, fmt(vat)]].forEach(([l, v]) => {
+      doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(110,110,110); doc.text(l, tx, y);
+      doc.setTextColor(40,40,40); doc.text(`AED ${v}`, W - M, y, { align: 'right' });
+      doc.setDrawColor(210,210,210); doc.setLineWidth(0.2); doc.line(tx, y+2, W-M, y+2);
+      y += 7;
+    });
+    doc.setFillColor(...navy);
+    doc.roundedRect(tx - 4, y - 3, W - M - tx + 8, 10, 2, 2, 'F');
+    doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(255,255,255);
+    doc.text('GRAND TOTAL', tx, y + 4);
+    doc.text(`AED ${fmt(grandTotal)}`, W - M, y + 4, { align: 'right' });
+    y += 18;
+  }
+
+  // ── Terms ──
+  if (y > 242) { doc.addPage(); y = 18; }
+  doc.setDrawColor(210,210,210); doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 6;
+  doc.setFontSize(8); doc.setFont('helvetica', 'bold'); doc.setTextColor(140,140,140);
+  doc.text('TERMS & CONDITIONS', M, y); y += 5;
+  doc.setFont('helvetica', 'normal'); doc.setTextColor(80,80,80);
+  const terms = ['Offer Validity: 30 Days', 'Payment Terms: 50% Advance – 50% Upon Delivery',
+    'Incoterms: DDP', 'VAT 5%: Applicable', 'Warranty: 2 Years', 'Est. Delivery: Subject to confirmation'];
+  for (let i = 0; i < terms.length; i += 2) {
+    doc.text(`· ${terms[i]}`, M, y);
+    if (terms[i+1]) doc.text(`· ${terms[i+1]}`, W/2, y);
+    y += 5;
+  }
+  if (customer.notes) {
+    y += 4;
+    doc.setFont('helvetica', 'bold'); doc.text('Notes: ', M, y);
+    doc.setFont('helvetica', 'normal');
+    const lines = doc.splitTextToSize(customer.notes, W - M*2 - 15);
+    doc.text(lines, M + 15, y);
+  }
+
+  // ── Footer ──
+  doc.setFontSize(8); doc.setTextColor(160,160,160);
+  doc.text('If you have any questions about this quotation, please contact pre-sales@medicom-grp.com', W/2, 287, { align: 'center' });
+
+  return doc;
+}
+
+// ── QuotePage ──────────────────────────────────────────────────────────────
+const QuotePage = ({ cart, data, onBack, onUpdateQty, onRemove }) => {
+  const p = data.quoteParams;
+  const ej = data.emailjs;
+  const [step, setStep] = React.useState('build'); // 'build' | 'form' | 'sent'
+  const [sending, setSending] = React.useState(false);
+  const [quoteNo] = React.useState(() => {
+    const d = new Date();
+    return `MSSQ${String(d.getFullYear()).slice(2)}${String(d.getMonth()+1).padStart(2,'0')}-${String(Math.floor(Math.random()*900)+100)}`;
+  });
+  const [customer, setCustomer] = React.useState({
+    name:'', company:'', email:'', phone:'', city:'', country:'', notes:''
+  });
+
+  const lineItems = cart.map(item => {
+    const prod = data.products.find(pr => pr.id === item.id);
+    if (!prod) return null;
+    const hasPrice = prod.price != null;
+    const calc = hasPrice ? calcQuotePrice(prod.price, item.qty, p) : null;
+    return { prod, qty: item.qty, hasPrice, calc };
+  }).filter(Boolean);
+
+  const subtotal   = lineItems.reduce((s, li) => s + (li.calc ? li.calc.totalAed : 0), 0);
+  const vat        = subtotal * p.vatPct;
+  const grandTotal = subtotal + vat;
+  const hasPrices  = lineItems.some(li => li.hasPrice);
+
+  const handleSend = async () => {
+    if (!customer.name || !customer.email) return;
+    setSending(true);
+    try {
+      const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+      const divider = '─'.repeat(60);
+
+      // Product list with prices — only Medicom sees this in the email
+      const productLines = lineItems.map((li, i) =>
+        `  ${String(i+1).padStart(2,'0')}. ${li.prod.id} — ${li.prod.name}\n` +
+        `      Qty: ${li.qty}  |  Unit: ${li.hasPrice ? fmtAed(li.calc.unitAed) : 'On request'}  |  Total: ${li.hasPrice ? fmtAed(li.calc.totalAed) : '—'}`
+      ).join('\n\n');
+
+      const totalsBlock = hasPrices
+        ? `${divider}\n  Subtotal        ${fmtAed(subtotal)}\n  VAT (${p.vatPct*100}%)      ${fmtAed(vat)}\n  GRAND TOTAL     ${fmtAed(grandTotal)}\n${divider}`
+        : '';
+
+      const fullQuotation =
+`QUOTE REQUEST
+Date: ${dateStr}
+${divider}
+
+CUSTOMER
+  Name:     ${customer.name}
+  Company:  ${customer.company || '—'}
+  Email:    ${customer.email}
+  Phone:    ${customer.phone || '—'}
+  Location: ${[customer.city, customer.country].filter(Boolean).join(', ') || '—'}
+${customer.notes ? '\nNOTES\n  ' + customer.notes : ''}
+
+REQUESTED PRODUCTS
+${productLines}
+
+${totalsBlock}`;
+
+      emailjs.init(ej.publicKey);
+      await emailjs.send(ej.serviceId, ej.templateId, {
+        customer_name:  customer.name,
+        company:        customer.company || '—',
+        email:          customer.email,
+        phone:          customer.phone || '—',
+        city:           customer.city || '—',
+        country:        customer.country || '—',
+        notes:          customer.notes || '—',
+        products:       productLines,
+        subtotal:       hasPrices ? fmtAed(subtotal) : 'N/A',
+        vat:            hasPrices ? fmtAed(vat) : 'N/A',
+        grand_total:    hasPrices ? fmtAed(grandTotal) : 'N/A',
+        date:           dateStr,
+        to_email:       ej.toEmail,
+        full_quotation: fullQuotation,
+      });
+      setStep('sent');
+    } catch(e) {
+      alert('Could not send. Check your EmailJS config. Error: ' + (e.text || e.message || e));
+    }
+    setSending(false);
+  };
+
+  // ── Sent confirmation ──
+  if (step === 'sent') return (
+    <div className="fade-in page-pad" style={{ maxWidth: 680, margin: '0 auto', padding: '80px 48px', textAlign: 'center' }}>
+      <div style={{ fontSize: 56, marginBottom: 20 }}>✅</div>
+      <h2 style={{ fontFamily: 'var(--display)', fontSize: 28, fontWeight: 500, color: 'var(--ink)', margin: '0 0 12px' }}>Request submitted</h2>
+      <p style={{ fontSize: 16, color: 'var(--ink-mid)', marginBottom: 8 }}>
+        Thank you! Your quote request has been received.
+      </p>
+      <p style={{ fontSize: 14, color: 'var(--ink-dim)', marginBottom: 32 }}>
+        Our team will review your selection and send you a formal quotation within 1–2 business days.
+      </p>
+      <button onClick={onBack} style={{ padding: '12px 24px', background: 'var(--ink)', color: 'var(--bg)', border: 'none', borderRadius: 8, fontFamily: 'var(--sans)', fontSize: 14, cursor: 'pointer' }}>
+        Back to catalogue
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="fade-in page-pad" style={{ maxWidth: 1120, margin: '0 auto', padding: '40px 48px 96px' }}>
+      <Crumb items={[{ label: 'All disciplines', onClick: onBack }, { label: 'Quote Request' }]} />
+      <div style={{ margin: '28px 0 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
+        <h1 style={{ fontFamily: 'var(--display)', fontWeight: 500, fontSize: 36, letterSpacing: '-0.02em', margin: 0, color: 'var(--ink)' }}>
+          {step === 'build' ? 'Your Selection' : 'Your Details'}
+        </h1>
+        {/* 2-step indicator */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {[['build','1. Products'],['form','2. Details']].map(([s, label], i) => (
+            <React.Fragment key={s}>
+              {i > 0 && <span style={{ color: 'var(--hairline-strong)', fontSize: 14 }}>›</span>}
+              <span style={{
+                padding: '6px 14px', borderRadius: 6, fontSize: 13, fontFamily: 'var(--sans)',
+                background: step === s ? 'var(--ink)' : 'var(--surface-2)',
+                color: step === s ? 'var(--bg)' : 'var(--ink-dim)',
+                cursor: s === 'build' && step === 'form' ? 'pointer' : 'default',
+              }} onClick={() => s === 'build' && step === 'form' && setStep('build')}>
+                {label}
+              </span>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Step 1: products (no prices) ── */}
+      {step === 'build' && (
+        <div>
+          {lineItems.length === 0 ? (
+            <div style={{ padding: '64px 24px', textAlign: 'center', border: '1px dashed var(--hairline)', borderRadius: 10, color: 'var(--ink-dim)', fontFamily: 'var(--sans)', fontSize: 14 }}>
+              No products added yet. Browse the catalogue and click "+ Add to Quote".
+            </div>
+          ) : (
+            <>
+              <table className="quote-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 30 }}>#</th>
+                    <th style={{ width: 110 }}>MODEL</th>
+                    <th>DESCRIPTION</th>
+                    <th style={{ width: 120, textAlign: 'center' }}>QUANTITY</th>
+                    <th style={{ width: 40 }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lineItems.map((li, i) => (
+                    <tr key={li.prod.id}>
+                      <td style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-dim)' }}>{String(i+1).padStart(2,'0')}</td>
+                      <td><span style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{li.prod.id}</span></td>
+                      <td style={{ color: 'var(--ink)' }}>{li.prod.name}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                          <button onClick={() => onUpdateQty(li.prod.id, li.qty - 1)} style={{ width: 26, height: 26, border: '1px solid var(--hairline)', background: 'var(--bg)', borderRadius: 5, cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>−</button>
+                          <span style={{ minWidth: 24, textAlign: 'center', fontFamily: 'var(--mono)', fontSize: 14, fontWeight: 500 }}>{li.qty}</span>
+                          <button onClick={() => onUpdateQty(li.prod.id, li.qty + 1)} style={{ width: 26, height: 26, border: '1px solid var(--hairline)', background: 'var(--bg)', borderRadius: 5, cursor: 'pointer', fontSize: 15, lineHeight: 1 }}>+</button>
+                        </div>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                        <button onClick={() => onRemove(li.prod.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-dim)', fontSize: 18, padding: 4 }} title="Remove">×</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ marginTop: 10, fontSize: 13, color: 'var(--ink-dim)', fontStyle: 'italic' }}>
+                Prices will be provided in the formal quotation from our team.
+              </div>
+              <div style={{ marginTop: 28, display: 'flex', justifyContent: 'flex-end' }}>
+                <button onClick={() => setStep('form')} style={{ padding: '11px 28px', background: 'var(--ink)', color: 'var(--bg)', border: 'none', borderRadius: 8, fontFamily: 'var(--sans)', fontSize: 14, cursor: 'pointer' }}>
+                  Next: Your details →
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Step 2: customer details + submit ── */}
+      {step === 'form' && (
+        <div style={{ maxWidth: 680 }}>
+          {/* Summary of selected products */}
+          <div style={{ marginBottom: 28, padding: '14px 18px', background: 'var(--surface-1)', border: '1px solid var(--hairline)', borderRadius: 8, fontSize: 13, color: 'var(--ink-mid)' }}>
+            <span style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.1em', color: 'var(--ink-dim)' }}>REQUESTING QUOTE FOR </span>
+            {lineItems.map((li, i) => (
+              <span key={li.prod.id}>
+                {i > 0 && <span style={{ color: 'var(--hairline-strong)' }}> · </span>}
+                <span style={{ fontFamily: 'var(--mono)', color: 'var(--ink)' }}>{li.prod.id}</span>
+                {li.qty > 1 && <span style={{ color: 'var(--ink-dim)' }}> ×{li.qty}</span>}
+              </span>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }} className="contact-name-grid">
+            {[['name','Full Name','text',true],['company','Company / Institution','text',false],
+              ['email','Email Address','email',true],['phone','Phone Number','tel',false],
+              ['city','City','text',false],['country','Country','text',false]].map(([k, label, type, req]) => (
+              <div key={k} className="form-field">
+                <label style={{ fontSize: 12, color: 'var(--ink-dim)', fontFamily: 'var(--mono)', letterSpacing: '0.08em' }}>{label.toUpperCase()}{req ? ' *' : ''}</label>
+                <input type={type} value={customer[k]} onChange={e => setCustomer(c => ({...c, [k]: e.target.value}))}
+                  style={{ padding: '9px 12px', border: '1px solid var(--hairline)', borderRadius: 7, fontSize: 14, fontFamily: 'var(--sans)', background: 'var(--surface-1)', color: 'var(--ink)', outline: 'none' }}
+                  onFocus={e => e.currentTarget.style.borderColor = 'var(--accent-border)'}
+                  onBlur={e => e.currentTarget.style.borderColor = 'var(--hairline)'} />
+              </div>
+            ))}
+          </div>
+          <div className="form-field" style={{ marginBottom: 28 }}>
+            <label style={{ fontSize: 12, color: 'var(--ink-dim)', fontFamily: 'var(--mono)', letterSpacing: '0.08em' }}>ADDITIONAL NOTES</label>
+            <textarea value={customer.notes} onChange={e => setCustomer(c => ({...c, notes: e.target.value}))} rows={4}
+              placeholder="Any specific requirements, delivery constraints, etc."
+              style={{ padding: '9px 12px', border: '1px solid var(--hairline)', borderRadius: 7, fontSize: 14, fontFamily: 'var(--sans)', background: 'var(--surface-1)', color: 'var(--ink)', outline: 'none', resize: 'vertical', width: '100%' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'var(--accent-border)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'var(--hairline)'} />
+          </div>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button onClick={() => setStep('build')} style={{ padding: '11px 20px', background: 'var(--bg)', color: 'var(--ink)', border: '1px solid var(--hairline)', borderRadius: 8, fontFamily: 'var(--sans)', fontSize: 14, cursor: 'pointer' }}>
+              ← Back
+            </button>
+            <button onClick={handleSend} disabled={sending || !customer.name || !customer.email}
+              style={{ padding: '11px 28px', background: 'var(--orange)', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'var(--sans)', fontSize: 14, cursor: 'pointer', fontWeight: 500, opacity: (sending || !customer.name || !customer.email) ? 0.5 : 1 }}>
+              {sending ? 'Sending…' : '✉ Submit quote request'}
+            </button>
+            {(!customer.name || !customer.email) && (
+              <span style={{ fontSize: 12, color: 'var(--ink-dim)' }}>Name and email are required</span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Auth helpers ────────────────────────────────────────────────────────────
+const authInputStyle = {
+  width: '100%', padding: '10px 13px', border: '1px solid var(--hairline)',
+  borderRadius: 7, fontSize: 14, fontFamily: 'var(--sans)',
+  background: 'var(--surface-1)', color: 'var(--ink)', outline: 'none',
+  boxSizing: 'border-box', transition: 'border-color 160ms',
+};
+
+// ── Account Settings Page ────────────────────────────────────────────────────
+const AccountPage = ({ user, onBack }) => {
+  const [name,        setName]        = React.useState(user.displayName || '');
+  const [email,       setEmail]       = React.useState(user.email || '');
+  const [newPassword, setNewPassword] = React.useState('');
+  const [confirmPw,   setConfirmPw]   = React.useState('');
+  const [currentPw,   setCurrentPw]   = React.useState('');
+  const [section,     setSection]     = React.useState('profile'); // 'profile' | 'email' | 'password'
+  const [loading,     setLoading]     = React.useState(false);
+  const [message,     setMessage]     = React.useState({ text: '', ok: true });
+
+  const showMsg = (text, ok = true) => { setMessage({ text, ok }); setTimeout(() => setMessage({ text: '', ok: true }), 4000); };
+
+  const reauth = async (password) => {
+    const cred = firebase.auth.EmailAuthProvider.credential(user.email, password);
+    await user.reauthenticateWithCredential(cred);
+  };
+
+  const saveName = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) { showMsg('Name cannot be empty.', false); return; }
+    setLoading(true);
+    try {
+      await user.updateProfile({ displayName: name.trim() });
+      showMsg('Name updated successfully.');
+    } catch (err) {
+      showMsg(err.message || 'Failed to update name.', false);
+    }
+    setLoading(false);
+  };
+
+  const saveEmail = async (e) => {
+    e.preventDefault();
+    if (!email.trim()) { showMsg('Email cannot be empty.', false); return; }
+    if (!currentPw)    { showMsg('Enter your current password to change email.', false); return; }
+    setLoading(true);
+    try {
+      await reauth(currentPw);
+      await user.updateEmail(email.trim());
+      setCurrentPw('');
+      showMsg('Email updated successfully.');
+    } catch (err) {
+      const map = {
+        'auth/wrong-password':      'Current password is incorrect.',
+        'auth/invalid-credential':  'Current password is incorrect.',
+        'auth/email-already-in-use':'This email is already in use.',
+        'auth/invalid-email':       'Please enter a valid email address.',
+        'auth/requires-recent-login':'Please sign out and sign back in, then try again.',
+      };
+      showMsg(map[err.code] || err.message || 'Failed to update email.', false);
+    }
+    setLoading(false);
+  };
+
+  const savePassword = async (e) => {
+    e.preventDefault();
+    if (newPassword.length < 6)  { showMsg('New password must be at least 6 characters.', false); return; }
+    if (newPassword !== confirmPw){ showMsg('Passwords do not match.', false); return; }
+    if (!currentPw)               { showMsg('Enter your current password to set a new one.', false); return; }
+    setLoading(true);
+    try {
+      await reauth(currentPw);
+      await user.updatePassword(newPassword);
+      setCurrentPw(''); setNewPassword(''); setConfirmPw('');
+      showMsg('Password updated successfully.');
+    } catch (err) {
+      const map = {
+        'auth/wrong-password':      'Current password is incorrect.',
+        'auth/invalid-credential':  'Current password is incorrect.',
+        'auth/weak-password':       'New password must be at least 6 characters.',
+        'auth/requires-recent-login':'Please sign out and sign back in, then try again.',
+      };
+      showMsg(map[err.code] || err.message || 'Failed to update password.', false);
+    }
+    setLoading(false);
+  };
+
+  const inputStyle = {
+    width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--hairline)',
+    background: 'var(--surface-2)', color: 'var(--ink)', fontFamily: 'var(--sans)', fontSize: 14,
+    boxSizing: 'border-box', outline: 'none', transition: 'border-color 150ms',
+  };
+  const labelStyle = { fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--ink-mid)', letterSpacing: '0.08em', display: 'block', marginBottom: 6 };
+  const btnPrimary = { width: '100%', padding: '11px', borderRadius: 8, border: 'none', background: 'var(--accent)', color: '#fff', fontFamily: 'var(--mono)', fontSize: 12, letterSpacing: '0.08em', cursor: 'pointer', marginTop: 4 };
+  const tabBtn = (active) => ({
+    padding: '8px 18px', borderRadius: 8, border: '1px solid var(--hairline)', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.08em',
+    background: active ? 'var(--accent)' : 'var(--surface-2)', color: active ? '#fff' : 'var(--ink-mid)', transition: 'all 150ms',
+  });
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ width: '100%', maxWidth: 480, background: 'var(--surface-1)', borderRadius: 16, padding: 32, boxShadow: '0 4px 32px rgba(0,0,0,0.12)' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+          <button onClick={onBack} style={{ background: 'none', border: '1px solid var(--hairline)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-mid)', letterSpacing: '0.06em' }}>← BACK</button>
+          <div>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 16, fontWeight: 700, color: 'var(--ink)', letterSpacing: '0.06em' }}>ACCOUNT SETTINGS</div>
+            <div style={{ fontSize: 12, color: 'var(--ink-dim)', marginTop: 2 }}>{user.email}</div>
+          </div>
+        </div>
+
+        {/* Section tabs */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+          {[['profile','NAME'],['email','EMAIL'],['password','PASSWORD']].map(([id, label]) => (
+            <button key={id} onClick={() => { setSection(id); setMessage({ text:'', ok:true }); setCurrentPw(''); }} style={tabBtn(section === id)}>{label}</button>
+          ))}
+        </div>
+
+        {/* Feedback message */}
+        {message.text && (
+          <div style={{ padding: '10px 14px', borderRadius: 8, marginBottom: 16, fontSize: 13, background: message.ok ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)', color: message.ok ? '#16a34a' : '#dc2626', border: `1px solid ${message.ok ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.2)'}` }}>
+            {message.text}
+          </div>
+        )}
+
+        {/* Profile name section */}
+        {section === 'profile' && (
+          <form onSubmit={saveName} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={labelStyle}>DISPLAY NAME</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" style={inputStyle} />
+            </div>
+            <button type="submit" disabled={loading} style={btnPrimary}>{loading ? 'SAVING…' : 'SAVE NAME'}</button>
+          </form>
+        )}
+
+        {/* Email section */}
+        {section === 'email' && (
+          <form onSubmit={saveEmail} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={labelStyle}>NEW EMAIL ADDRESS</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>CURRENT PASSWORD (required to change email)</label>
+              <input type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="••••••••" style={inputStyle} />
+            </div>
+            <button type="submit" disabled={loading} style={btnPrimary}>{loading ? 'SAVING…' : 'SAVE EMAIL'}</button>
+          </form>
+        )}
+
+        {/* Password section */}
+        {section === 'password' && (
+          <form onSubmit={savePassword} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={labelStyle}>CURRENT PASSWORD</label>
+              <input type="password" value={currentPw} onChange={e => setCurrentPw(e.target.value)} placeholder="••••••••" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>NEW PASSWORD</label>
+              <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>CONFIRM NEW PASSWORD</label>
+              <input type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} placeholder="••••••••" style={inputStyle} />
+            </div>
+            <button type="submit" disabled={loading} style={btnPrimary}>{loading ? 'SAVING…' : 'SAVE PASSWORD'}</button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const authErrorMap = {
+  'auth/user-not-found':        'No account found with this email.',
+  'auth/wrong-password':        'Incorrect password.',
+  'auth/invalid-credential':    'Incorrect email or password.',
+  'auth/email-already-in-use':  'An account with this email already exists.',
+  'auth/invalid-email':         'Please enter a valid email address.',
+  'auth/weak-password':         'Password must be at least 6 characters.',
+  'auth/too-many-requests':     'Too many attempts. Please try again later.',
+  'auth/operation-not-allowed': 'Email/password sign-in is not enabled. Please contact support.',
+  'auth/network-request-failed':'Network error. Please check your connection and try again.',
+  'auth/internal-error':        'An internal error occurred. Please try again.',
+  'auth/missing-password':      'Please enter a password.',
+  'auth/missing-email':         'Please enter an email address.',
+};
+
+const AuthPage = ({ onGuest }) => {
+  const [tab, setTab]           = React.useState('login');
+  const [name, setName]         = React.useState('');
+  const [email, setEmail]       = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [confirm, setConfirm]   = React.useState('');
+  const [loading, setLoading]   = React.useState(false);
+  const [error, setError]       = React.useState('');
+
+  const switchTab = (t) => { setTab(t); setError(''); };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (tab === 'register') {
+      if (password !== confirm) { setError('Passwords do not match.'); return; }
+      if (password.length < 6)  { setError('Password must be at least 6 characters.'); return; }
+    }
+    setLoading(true);
+    try {
+      const auth = firebase.auth();
+      if (tab === 'login') {
+        await auth.signInWithEmailAndPassword(email, password);
+      } else {
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        if (name.trim()) await cred.user.updateProfile({ displayName: name.trim() });
+      }
+      // onAuthStateChanged in App will take over from here
+    } catch (err) {
+      console.error('[Auth error]', err.code, err.message);
+      setError(authErrorMap[err.code] || `Something went wrong (${err.code || 'unknown'}). Please try again.`);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
+      {/* Mini topbar */}
+      <div style={{ background: 'var(--navy)', borderBottom: '3px solid var(--orange)', padding: '0' }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto', padding: '14px 48px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--orange)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--mono)', fontSize: 11, color: '#fff', fontWeight: 500 }}>A</div>
+          <span style={{ fontFamily: 'var(--display)', fontSize: 14, color: '#fff', fontWeight: 500, letterSpacing: '-0.005em' }}>Armfield Product Explorer · Medicom Scientific</span>
+        </div>
+      </div>
+
+      {/* Card */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px 24px' }}>
+        <div className="fade-in" style={{ width: '100%', maxWidth: 420 }}>
+
+          {/* Logos */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 36 }}>
+            <img src="images/armfield-logo.png" alt="Armfield" onError={e => e.currentTarget.style.display='none'}
+              style={{ height: 36, background: '#1d2657', padding: '5px 12px', borderRadius: 6 }} />
+            <img src="images/company-logo.png" alt="Medicom Scientific" onError={e => e.currentTarget.style.display='none'}
+              style={{ height: 30, background: 'var(--surface-2)', padding: '4px 10px', borderRadius: 6 }} />
+          </div>
+
+          <h1 style={{ fontFamily: 'var(--display)', fontSize: 30, fontWeight: 500, color: 'var(--ink)', margin: '0 0 6px', letterSpacing: '-0.02em' }}>Welcome</h1>
+          <p style={{ fontSize: 14, color: 'var(--ink-mid)', margin: '0 0 28px', lineHeight: 1.5 }}>
+            Sign in to access the Armfield equipment catalogue and request quotations.
+          </p>
+
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: 2, padding: 3, background: 'var(--surface-2)', border: '1px solid var(--hairline)', borderRadius: 9, marginBottom: 22 }}>
+            {[['login','Sign In'],['register','Create Account']].map(([t, label]) => (
+              <button key={t} onClick={() => switchTab(t)} style={{
+                flex: 1, padding: '8px 0', borderRadius: 7, border: 'none',
+                fontFamily: 'var(--sans)', fontSize: 13, cursor: 'pointer',
+                transition: 'all 140ms',
+                background: tab === t ? 'var(--bg)' : 'transparent',
+                color: tab === t ? 'var(--ink)' : 'var(--ink-dim)',
+                fontWeight: tab === t ? 500 : 400,
+                boxShadow: tab === t ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              }}>{label}</button>
+            ))}
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {tab === 'register' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <label style={{ fontSize: 11, color: 'var(--ink-dim)', fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>FULL NAME</label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Your name"
+                  style={authInputStyle} onFocus={e => e.target.style.borderColor='var(--accent-border)'} onBlur={e => e.target.style.borderColor='var(--hairline)'} />
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <label style={{ fontSize: 11, color: 'var(--ink-dim)', fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>EMAIL ADDRESS</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@company.com"
+                style={authInputStyle} onFocus={e => e.target.style.borderColor='var(--accent-border)'} onBlur={e => e.target.style.borderColor='var(--hairline)'} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <label style={{ fontSize: 11, color: 'var(--ink-dim)', fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>PASSWORD</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" minLength={6}
+                style={authInputStyle} onFocus={e => e.target.style.borderColor='var(--accent-border)'} onBlur={e => e.target.style.borderColor='var(--hairline)'} />
+            </div>
+            {tab === 'register' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <label style={{ fontSize: 11, color: 'var(--ink-dim)', fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>CONFIRM PASSWORD</label>
+                <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required placeholder="••••••••"
+                  style={authInputStyle} onFocus={e => e.target.style.borderColor='var(--accent-border)'} onBlur={e => e.target.style.borderColor='var(--hairline)'} />
+              </div>
+            )}
+
+            {error && (
+              <div style={{ padding: '10px 14px', background: 'oklch(97% 0.02 30)', border: '1px solid oklch(85% 0.07 30)', borderRadius: 7, fontSize: 13, color: 'oklch(40% 0.14 30)', lineHeight: 1.4 }}>
+                {error}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading} style={{
+              marginTop: 2, padding: '12px 0', background: 'var(--navy)', color: '#fff',
+              border: 'none', borderRadius: 8, fontFamily: 'var(--sans)', fontSize: 14,
+              fontWeight: 500, cursor: loading ? 'wait' : 'pointer',
+              opacity: loading ? 0.7 : 1, transition: 'opacity 140ms',
+            }}>
+              {loading
+                ? (tab === 'login' ? 'Signing in…' : 'Creating account…')
+                : (tab === 'login' ? 'Sign In' : 'Create Account')}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '22px 0' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--hairline)' }} />
+            <span style={{ fontSize: 12, color: 'var(--ink-dim)', fontFamily: 'var(--sans)' }}>or</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--hairline)' }} />
+          </div>
+
+          {/* Guest */}
+          <button onClick={onGuest} style={{
+            width: '100%', padding: '11px 0', background: 'var(--bg)', color: 'var(--ink)',
+            border: '1px solid var(--hairline)', borderRadius: 8, fontFamily: 'var(--sans)',
+            fontSize: 14, cursor: 'pointer', transition: 'all 140ms',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-1)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--bg)'}>
+            Continue as Guest
+          </button>
+          <p style={{ fontSize: 12, color: 'var(--ink-dim)', textAlign: 'center', margin: '10px 0 0', lineHeight: 1.5 }}>
+            Guest access includes full catalogue browsing and quote requests.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function App() {
+  const data = window.ARMFIELD_DATA;
+
+  const [route, setRoute] = useState({ level: 'home' });
+
+  // ── Firebase Auth ──
+  const fbCfg = data.firebase;
+  const fbReady = fbCfg && fbCfg.apiKey && !fbCfg.apiKey.startsWith('YOUR_');
+  const [authLoading, setAuthLoading] = useState(fbReady);
+  const [currentUser,  setCurrentUser]  = useState(null);
+  const [isGuest,      setIsGuest]      = useState(() => sessionStorage.getItem('armfield_guest') === '1');
+
+  const logSession = (user, event) => {
+    try {
+      firebase.firestore().collection('sessions').add({
+        email:     user.email,
+        name:      user.displayName || '',
+        uid:       user.uid,
+        event,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    } catch (e) { console.warn('Session log failed:', e); }
+  };
+
+  useEffect(() => {
+    if (!fbReady) return;
+    if (!firebase.apps.length) firebase.initializeApp(fbCfg);
+    let prevUid = null;
+    const unsub = firebase.auth().onAuthStateChanged(user => {
+      setCurrentUser(user);
+      setAuthLoading(false);
+      if (user && user.uid !== prevUid) {
+        logSession(user, 'signed_in');
+        prevUid = user.uid;
+      }
+    });
+    return unsub;
+  }, []);
+
+  const handleGuest   = () => { sessionStorage.setItem('armfield_guest', '1'); setIsGuest(true); };
+  const handleSignOut = async () => {
+    const user = firebase.auth().currentUser;
+    if (fbReady && firebase.apps.length) {
+      if (user) logSession(user, 'signed_out');
+      await firebase.auth().signOut();
+    }
+    sessionStorage.removeItem('armfield_guest');
+    setIsGuest(false);
+    setCurrentUser(null);
+  };
+
+  // ── All hooks must be declared before any early returns (React Rules of Hooks) ──
+
+  // Quote cart
+  const [quoteCart, setQuoteCart] = useState([]);
+
+  // Theme toggle: 'system' | 'light' | 'dark'
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'system');
+  useEffect(() => {
+    if (theme === 'system') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('All');
+
+  // Navigation history for back/forward
+  const [navHistory, setNavHistory] = useState([{ level: 'home' }]);
+  const [navIdx, setNavIdx] = useState(0);
+
+  // ── Early returns (all hooks are above — safe to return early now) ──
+
+  // Show spinner while Firebase checks existing session
+  if (authLoading) return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
+      <div style={{ fontFamily: 'var(--mono)', fontSize: 12, color: 'var(--ink-dim)', letterSpacing: '0.1em' }}>LOADING…</div>
+    </div>
+  );
+
+  // Show auth page if Firebase is configured and user isn't authed/guest
+  if (fbReady && !currentUser && !isGuest) return <AuthPage onGuest={handleGuest} />;
+
+  // ── Derived values and handlers (regular functions, not hooks — fine after early returns) ──
+
+  const canBack = navIdx > 0;
+  const canForward = navIdx < navHistory.length - 1;
+
+  const go = (r) => {
+    setRoute(r);
+    setNavHistory(h => [...h.slice(0, navIdx + 1), r]);
+    setNavIdx(i => i + 1);
+  };
+  const goBack = () => {
+    if (!canBack) return;
+    const newIdx = navIdx - 1;
+    setRoute(navHistory[newIdx]);
+    setNavIdx(newIdx);
+  };
+  const goForward = () => {
+    if (!canForward) return;
+    const newIdx = navIdx + 1;
+    setRoute(navHistory[newIdx]);
+    setNavIdx(newIdx);
+  };
+  const home = () => { setQuery(''); go({ level: 'home' }); };
+  const goContact = (productId) => go({ level: 'contact', productId: productId || null });
+  const goAccount = () => go({ level: 'account' });
+
+  const addToQuote = (productId) => {
+    setQuoteCart(c => c.find(i => i.id === productId) ? c : [...c, { id: productId, qty: 1 }]);
+  };
+  const removeFromQuote = (productId) => setQuoteCart(c => c.filter(i => i.id !== productId));
+  const updateQty = (productId, qty) => {
+    if (qty < 1) { removeFromQuote(productId); return; }
+    setQuoteCart(c => c.map(i => i.id === productId ? { ...i, qty } : i));
+  };
+  const inCart = (productId) => quoteCart.some(i => i.id === productId);
+  const goQuote = () => go({ level: 'quote' });
+
+  const cycleTheme = () => setTheme(t => t === 'system' ? 'light' : t === 'light' ? 'dark' : 'system');
+  const themeIcon  = theme === 'dark' ? '🌙' : theme === 'light' ? '☀️' : '⚙️';
+  const themeLabel = theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'System';
+
+  const major = route.major ? data.majors.find(m => m.id === route.major) : null;
+  const category = route.cat ? { id: route.cat, ...data.categories[route.cat] } : null;
+  const product = route.product ? data.products.find(p => p.id === route.product) : null;
+
+  const jumpProduct = (pid) => {
+    const p = data.products.find(x => x.id === pid);
+    if (!p) return;
+    const parentMajor = data.majors.find(m => m.categories.includes(p.cat));
+    go({ level: 'product', major: parentMajor ? parentMajor.id : null, cat: p.cat, product: pid });
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Back / Forward arrows */}
+            {[{ label: '←', action: goBack, enabled: canBack }, { label: '→', action: goForward, enabled: canForward }].map(({ label, action, enabled }) => (
+              <button key={label} onClick={action} disabled={!enabled} style={{ width: 30, height: 30, borderRadius: 6, border: '1px solid rgba(255,255,255,0.2)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: enabled ? 'pointer' : 'default', color: enabled ? '#ffffff' : 'rgba(255,255,255,0.25)', fontSize: 15, transition: 'all 140ms', fontFamily: 'inherit' }}
+                onMouseEnter={e => { if (enabled) e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}>
+                {label}
+              </button>
+            ))}
+            <button className="logo" onClick={home} style={{ marginLeft: 4 }}>
+              <span className="logo-mark">A</span>
+              <span>Product Explorer</span>
+              <span className="topbar-subtitle" style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 400, marginLeft: 4 }}>· Armfield equipment catalogue</span>
+            </button>
+          </div>
+          <div className="topbar-right">
+            <span className="topbar-models">{data.products.length} MODELS</span>
+            <span className="topbar-sep" style={{ color: 'rgba(255,255,255,0.3)', margin: '0 4px' }}>·</span>
+            <button className="topbar-contact" onClick={() => goContact(null)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 6, padding: '5px 12px', fontFamily: 'var(--mono)', fontSize: 11, color: 'rgba(255,255,255,0.7)', cursor: 'pointer', letterSpacing: '0.08em', transition: 'all 140ms' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = '#ffffff'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}>
+              CONTACT US
+            </button>
+            {/* Auth status */}
+            {fbReady && (
+              <>
+                <span className="topbar-sep" style={{ color: 'rgba(255,255,255,0.3)', margin: '0 4px' }}>·</span>
+                {currentUser ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <button onClick={goAccount} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontFamily: 'var(--mono)', fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'underline', textUnderlineOffset: 3 }}
+                      onMouseEnter={e => e.currentTarget.style.color='#fff'}
+                      onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.55)'}>
+                      {currentUser.displayName || currentUser.email}
+                    </button>
+                    <button onClick={handleSignOut} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6, padding: '4px 10px', fontFamily: 'var(--mono)', fontSize: 10, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', letterSpacing: '0.08em', transition: 'all 140ms' }}
+                      onMouseEnter={e => { e.currentTarget.style.color='#fff'; e.currentTarget.style.borderColor='rgba(255,255,255,0.5)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color='rgba(255,255,255,0.55)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.2)'; }}>
+                      SIGN OUT
+                    </button>
+                  </div>
+                ) : (
+                  <span style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>GUEST</span>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {route.level === 'home' && (
+        <Landing data={data} query={query} setQuery={setQuery} filter={filter} setFilter={setFilter}
+          onPickMajor={(id) => go({ level: 'major', major: id })} onJumpProduct={jumpProduct} />
+      )}
+      {route.level === 'major' && major && (
+        <Categories major={major} data={data} filter={filter} onBack={home}
+          onPickCategory={(cid) => go({ level: 'category', major: major.id, cat: cid })} />
+      )}
+      {route.level === 'category' && major && category && (
+        <Products major={major} category={category} data={data} filter={filter} onBack={home}
+          onBackToMajor={() => go({ level: 'major', major: major.id })}
+          onPickProduct={(pid) => go({ level: 'product', major: major.id, cat: category.id, product: pid })}
+          onAddToQuote={addToQuote} inCart={inCart} />
+      )}
+      {route.level === 'product' && product && (
+        <ProductDetail product={product} data={data} onBackHome={home}
+          onBackToMajor={() => major && go({ level: 'major', major: major.id })}
+          onBackToCategory={() => go({ level: 'category', major: major ? major.id : null, cat: product.cat })}
+          onPickProduct={jumpProduct}
+          onRequestQuote={goContact}
+          onAddToQuote={addToQuote} inCart={inCart(product.id)} />
+      )}
+      {route.level === 'contact' && (
+        <ContactPage
+          prefillModel={route.productId || null}
+          data={data}
+          onBack={() => {
+            if (route.productId) { jumpProduct(route.productId); return; }
+            home();
+          }}
+        />
+      )}
+
+      {route.level === 'quote' && (
+        <QuotePage
+          cart={quoteCart}
+          data={data}
+          onBack={home}
+          onUpdateQty={updateQty}
+          onRemove={removeFromQuote}
+        />
+      )}
+
+      {route.level === 'account' && currentUser && (
+        <AccountPage user={currentUser} onBack={goBack} />
+      )}
+
+      {/* ── Floating quote cart button ── */}
+      {quoteCart.length > 0 && route.level !== 'quote' && (
+        <button className="quote-fab no-print" onClick={goQuote}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/>
+            <path d="M9 12h6M9 16h4"/>
+          </svg>
+          Quote ({quoteCart.length} item{quoteCart.length !== 1 ? 's' : ''})
+        </button>
+      )}
+
+      {/* ── Site footer ── */}
+      <footer className="site-footer">
+        <div className="site-footer-inner">
+          {/* Col 1 – About */}
+          <div>
+            <h4>Medicom Scientific</h4>
+            <p style={{ margin: '0 0 10px', lineHeight: 1.6, color: 'rgba(255,255,255,0.55)' }}>
+              Authorised distributor of Armfield teaching and research equipment.
+              Supplying laboratories across the region with world-class engineering apparatus.
+            </p>
+            <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+              <img src="images/armfield-logo.png" alt="Armfield" onError={e => e.currentTarget.style.display='none'} style={{ height: 28, width: 'auto', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 5 }} />
+              <img src="images/company-logo.png" alt="Medicom Scientific" onError={e => e.currentTarget.style.display='none'} style={{ height: 28, width: 'auto', background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: 5 }} />
+            </div>
+          </div>
+
+          {/* Col 2 – Contact */}
+          <div>
+            <h4>Contact Us</h4>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <li style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span style={{ color: 'var(--orange)', marginTop: 1 }}>📍</span>
+                <span>L1-07 Ajman Freezone,<br />Ajman, UAE</span>
+              </li>
+              <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <span style={{ color: 'var(--orange)' }}>✉</span>
+                <a href="mailto:pre-sales@medicom-grp.com">pre-sales@medicom-grp.com</a>
+              </li>
+              <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <span style={{ color: 'var(--orange)' }}>📞</span>
+                <a href="tel:+971501122301">+971 50 112 2301</a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 3 – Quick links */}
+          <div>
+            <h4>Quick Links</h4>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <li><button onClick={home} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--sans)', fontSize: 13, transition: 'color 140ms' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#fff'} onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.65)'}>
+                All Disciplines
+              </button></li>
+              <li><button onClick={() => goContact(null)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'rgba(255,255,255,0.65)', fontFamily: 'var(--sans)', fontSize: 13, transition: 'color 140ms' }}
+                onMouseEnter={e => e.currentTarget.style.color = '#fff'} onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.65)'}>
+                Contact / Request Quote
+              </button></li>
+              <li><a href="https://armfield.co.uk" target="_blank" rel="noopener noreferrer">Armfield Website ↗</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="site-footer-bottom">
+          <span>© {new Date().getFullYear()} Medicom Scientific. All rights reserved.</span>
+          <span>Armfield equipment distributed under authorised partnership.</span>
+          <button onClick={cycleTheme} title="Toggle colour theme" style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: 6, padding: '5px 10px', cursor: 'pointer',
+            fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.08em',
+            color: 'rgba(255,255,255,0.55)', transition: 'all 140ms',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background='rgba(255,255,255,0.14)'; e.currentTarget.style.color='rgba(255,255,255,0.9)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.08)'; e.currentTarget.style.color='rgba(255,255,255,0.55)'; }}>
+            <span>{themeIcon}</span>
+            <span>{themeLabel.toUpperCase()}</span>
+          </button>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
